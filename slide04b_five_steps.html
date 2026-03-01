@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, height=720, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; }
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #FFFFFF;
+            font-family: 'Noto Sans JP', sans-serif;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #002060;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .page-title {
+            font-size: 36px;
+            color: #002060;
+            font-weight: 700;
+        }
+        .logo-text {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: #002060;
+            font-size: 18px;
+        }
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section-title {
+            font-size: 24px;
+            color: #333333;
+            font-weight: 700;
+            margin-bottom: 10px;
+            border-left: 6px solid #00A0E9;
+            padding-left: 15px;
+        }
+        .steps-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .steps-table th {
+            background-color: #F5F5F5;
+            color: #333333;
+            padding: 10px 15px;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 2px solid #002060;
+        }
+        .steps-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #E0E0E0;
+            vertical-align: middle;
+            color: #333333;
+        }
+        .step-cell {
+            color: #FFFFFF !important;
+            font-weight: 700;
+            font-size: 18px;
+            width: 20%;
+        }
+        .steps-table tr:nth-child(1) .step-cell { background-color: #80C4E9; }
+        .steps-table tr:nth-child(2) .step-cell { background-color: #4DA6DE; }
+        .steps-table tr:nth-child(3) .step-cell { background-color: #00A0E9; }
+        .steps-table tr:nth-child(4) .step-cell { background-color: #0060A0; }
+        .steps-table tr:nth-child(5) .step-cell { background-color: #002060; }
+        .col-psych { width: 20%; font-weight: 500; }
+        .col-goal { width: 30%; }
+        .col-contrib { width: 30%; font-weight: 700; color: #002060; }
+        .logic-box {
+            background-color: #F9F9F9;
+            border-left: 4px solid #333333;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        .logic-title {
+            font-weight: 700;
+            color: #002060;
+            margin-bottom: 8px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logic-text {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #333333;
+        }
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666666;
+            font-family: 'Roboto', sans-serif;
+            border-top: 1px solid #E0E0E0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1 class="page-title">メインバンク化5ステップがトップライン向上を実現する</h1>
+            <span class="logo-text">NTT DATA</span>
+        </div>
+        <div class="content-area">
+            <div>
+                <h2 class="section-title">メインバンク化5ステップ</h2>
+                <table class="steps-table">
+                    <thead>
+                        <tr>
+                            <th>ステップ</th>
+                            <th>顧客の心理段階</th>
+                            <th>目標</th>
+                            <th>トップラインへの貢献</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="step-cell">1. 接点獲得</td>
+                            <td class="col-psych">Customer（顧客化）</td>
+                            <td class="col-goal">最初の対面接点の質を向上</td>
+                            <td class="col-contrib">新規顧客の獲得</td>
+                        </tr>
+                        <tr>
+                            <td class="step-cell">2. 利便性向上</td>
+                            <td class="col-psych">Client（得意客化）</td>
+                            <td class="col-goal">デジタルとリアルで満足度向上</td>
+                            <td class="col-contrib">離反防止、取引継続</td>
+                        </tr>
+                        <tr>
+                            <td class="step-cell">3. 資産形成支援</td>
+                            <td class="col-psych">Supporter（支持者化）</td>
+                            <td class="col-goal">長期的な関係を構築</td>
+                            <td class="col-contrib">財形貯蓄等の預金増加</td>
+                        </tr>
+                        <tr>
+                            <td class="step-cell">4. 取引深化</td>
+                            <td class="col-psych">Advocate（推奨者化）</td>
+                            <td class="col-goal">確度の高い提案を実施</td>
+                            <td class="col-contrib">住宅ローン等の大型商品成約</td>
+                        </tr>
+                        <tr>
+                            <td class="step-cell">5. 関係性強化</td>
+                            <td class="col-psych">Raving Fan（熱狂的ファン化）</td>
+                            <td class="col-goal">LTVを最大化</td>
+                            <td class="col-contrib">生涯にわたる収益の最大化</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="logic-box">
+                <div class="logic-title">
+                    <i class="fas fa-lightbulb"></i> なぜこの順序なのか
+                </div>
+                <p class="logic-text">
+                    顧客ロイヤルティラダー理論に基づき、<strong>心理的障壁の低い接点から段階的に信頼を構築</strong>し、最終的に大型商品の成約へと繋げる科学的なアプローチです。
+                </p>
+            </div>
+        </div>
+        <div class="footer">
+            <span>© 2026 NTT DATA Group Corporation</span>
+            <span>4</span>
+        </div>
+    </div>
+</body>
+</html>

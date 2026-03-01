@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, height=720, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; }
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #FFFFFF;
+            font-family: 'Noto Sans JP', sans-serif;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #002060;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .page-title {
+            font-size: 36px;
+            color: #002060;
+            font-weight: 700;
+        }
+        .logo-text {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: #002060;
+            font-size: 18px;
+        }
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .question-box {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333333;
+        }
+        .comparison-container {
+            display: flex;
+            gap: 0;
+            flex: 1;
+            align-items: stretch;
+        }
+        .strategy-col {
+            flex: 1;
+            background-color: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-right: none;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .col-header {
+            font-size: 22px;
+            font-weight: 700;
+            color: #666666;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #CCCCCC;
+            padding-bottom: 10px;
+        }
+        .strategy-list {
+            list-style: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .strategy-item {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            color: #555555;
+        }
+        .strategy-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #666666;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        .connector {
+            width: 60px;
+            background-color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            margin: 0 -1px;
+            border-top: 1px solid #E0E0E0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        .arrow-circle {
+            width: 50px;
+            height: 50px;
+            background-color: #E60012;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size: 20px;
+        }
+        .risk-col {
+            flex: 1;
+            background-color: #FFF0F0;
+            border: 1px solid #FFCCCC;
+            border-left: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .risk-header {
+            font-size: 22px;
+            font-weight: 700;
+            color: #E60012;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #FF9999;
+            padding-bottom: 10px;
+        }
+        .risk-list {
+            list-style: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .risk-item {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #CC0000;
+        }
+        .risk-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #E60012;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        .risk-desc {
+            font-size: 16px;
+            color: #666666;
+            font-weight: 400;
+            margin-left: 55px;
+            margin-top: -10px;
+        }
+        .message-box {
+            background-color: #333333;
+            color: #FFFFFF;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .message-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666666;
+            font-family: 'Roboto', sans-serif;
+            border-top: 1px solid #E0E0E0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1 class="page-title">メガバンクと同じ打ち手では勝てない</h1>
+            <span class="logo-text">NTT DATA</span>
+        </div>
+        <div class="content-area">
+            <div class="question-box">
+                <span class="question-text">効率化一辺倒のデジタル化で、本当に勝てるのか？</span>
+            </div>
+            <div class="comparison-container">
+                <div class="strategy-col">
+                    <h3 class="col-header">メガバンクの戦略</h3>
+                    <ul class="strategy-list">
+                        <li class="strategy-item">
+                            <div class="strategy-icon"><i class="fas fa-store-slash"></i></div>
+                            <span>店舗・人員の大幅削減</span>
+                        </li>
+                        <li class="strategy-item">
+                            <div class="strategy-icon"><i class="fas fa-robot"></i></div>
+                            <span>AI・RPAによる完全自動化</span>
+                        </li>
+                        <li class="strategy-item">
+                            <div class="strategy-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <span>スマホ完結型サービスの推進</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="connector">
+                    <div class="arrow-circle">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+                <div class="risk-col">
+                    <h3 class="risk-header">労働金庫が陥る罠</h3>
+                    <ul class="risk-list">
+                        <li class="risk-item">
+                            <div class="risk-icon"><i class="fas fa-balance-scale-right"></i></div>
+                            <span>規模の経済で劣る</span>
+                        </li>
+                        <div class="risk-desc">システム投資額、データ量で圧倒的な差があり、同じ土俵では勝てない</div>
+                        <li class="risk-item">
+                            <div class="risk-icon"><i class="fas fa-handshake-slash"></i></div>
+                            <span>差別化要因を失う</span>
+                        </li>
+                        <div class="risk-desc">「対面での丁寧な相談」という最大の強みを、自ら捨てることになる</div>
+                        <li class="risk-item">
+                            <div class="risk-icon"><i class="fas fa-user-minus"></i></div>
+                            <span>顧客離反のリスク</span>
+                        </li>
+                        <div class="risk-desc">「労金でなくてもいい」と思われ、利便性の高い他行へ流出する</div>
+                    </ul>
+                </div>
+            </div>
+            <div class="message-box">
+                <p class="message-text">メガバンクと同じ土俵で戦っても、勝ち目はない。</p>
+            </div>
+        </div>
+        <div class="footer">
+            <span>© 2026 NTT DATA Group Corporation</span>
+            <span>3</span>
+        </div>
+    </div>
+</body>
+</html>

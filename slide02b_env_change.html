@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, height=720, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; }
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #FFFFFF;
+            font-family: 'Noto Sans JP', sans-serif;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #002060;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .page-title {
+            font-size: 32px;
+            color: #002060;
+            font-weight: 700;
+        }
+        .logo-text {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: #002060;
+            font-size: 18px;
+        }
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .question-box {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333333;
+            border-bottom: 3px solid #E60012;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        .waves-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+        .wave-card {
+            flex: 1;
+            background-color: #F9F9F9;
+            border: 1px solid #E0E0E0;
+            border-radius: 4px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .wave-icon {
+            font-size: 40px;
+            color: #002060;
+            margin-bottom: 15px;
+        }
+        .wave-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #002060;
+            margin-bottom: 15px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wave-stat {
+            font-size: 32px;
+            font-weight: 700;
+            color: #E60012;
+            margin-bottom: 10px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .wave-desc {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            flex: 1;
+        }
+        .wave-source {
+            font-size: 10px;
+            color: #999999;
+            text-align: right;
+            width: 100%;
+        }
+        .message-box {
+            background-color: #002060;
+            color: #FFFFFF;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .message-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666666;
+            font-family: 'Roboto', sans-serif;
+            border-top: 1px solid #E0E0E0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1 class="page-title">今、労働金庫を取り巻く環境変化</h1>
+            <span class="logo-text">NTT DATA</span>
+        </div>
+        <div class="content-area">
+            <div class="question-box">
+                <span class="question-text">今の延長線上に、未来はあるか？</span>
+            </div>
+            <div class="waves-container">
+                <div class="wave-card">
+                    <i class="fas fa-users-slash wave-icon"></i>
+                    <h3 class="wave-title">人口減少と<br>デジタルシフト</h3>
+                    <div class="wave-stat">来店 20%減</div>
+                    <p class="wave-desc">
+                        生産年齢人口の減少に加え、顧客の行動が非対面チャネルへ急速に移行。<br>
+                        店舗の存在意義が問われている。
+                    </p>
+                    <div class="wave-source">出典：全国銀行協会「銀行店舗数の推移」(2010年比)</div>
+                </div>
+                <div class="wave-card">
+                    <i class="fas fa-robot wave-icon"></i>
+                    <h3 class="wave-title">メガバンクの<br>デジタル攻勢</h3>
+                    <div class="wave-stat">スマホ完結</div>
+                    <p class="wave-desc">
+                        AIチャットボットやアプリ完結型サービスで、若年層を中心に顧客を囲い込み。<br>
+                        利便性での競争が激化。
+                    </p>
+                    <div class="wave-source">出典：各行公表資料より</div>
+                </div>
+                <div class="wave-card">
+                    <i class="fas fa-chart-line-down wave-icon"></i>
+                    <h3 class="wave-title">労働組合<br>組織率の低下</h3>
+                    <div class="wave-stat">16.3%</div>
+                    <p class="wave-desc">
+                        伝統的な顧客基盤である労働組合の組織率は過去最低水準。<br>
+                        「待っていれば客が来る」時代の終焉。
+                    </p>
+                    <div class="wave-source">出典：厚生労働省「令和6年労働組合基礎調査」</div>
+                </div>
+            </div>
+            <div class="message-box">
+                <p class="message-text">このままでは、労働金庫は「縮小均衡」の道を辿るしかない。</p>
+            </div>
+        </div>
+        <div class="footer">
+            <span>© 2026 NTT DATA Group Corporation</span>
+            <span>2</span>
+        </div>
+    </div>
+</body>
+</html>
