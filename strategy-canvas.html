@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戦略カンバス｜アジェンダ × ソリューション マッピング</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: #0f1020;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* ── Header ──────────────────────────────────────────── */
+        .header {
+            background: #002060;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #00A0E9;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .header-title { font-size: 14px; font-weight: 700; color: #fff; }
+        .header-subtitle { font-size: 11px; color: #7ab8ff; margin-top: 2px; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .btn {
+            padding: 6px 13px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s;
+            white-space: nowrap;
+        }
+        .btn-back   { background: transparent; color: #888; border: 1px solid #444; }
+        .btn-back:hover { color: #ccc; border-color: #888; }
+        .btn-agenda { background: #0d1e48; color: #7ab8ff; border: 1px solid #2a4a9a; }
+        .btn-agenda:hover { background: #152e68; }
+        .btn-sol    { background: #180d38; color: #c07aff; border: 1px solid #5a2a9a; }
+        .btn-sol:hover { background: #220f52; }
+        .btn-export { background: transparent; color: #00A0E9; border: 1px solid #00A0E9; }
+        .btn-export:hover { background: #003080; }
+        .export-ok  { font-size: 11px; color: #6fdc8c; margin-left: 4px; }
+
+        /* ── Step guide ──────────────────────────────────────── */
+        .step-guide {
+            background: #12132a;
+            padding: 7px 20px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            font-size: 11px;
+            color: #666;
+            border-bottom: 1px solid #1e1e3a;
+            flex-wrap: wrap;
+        }
+        .step { display: flex; align-items: center; gap: 6px; }
+        .step-num {
+            background: #00A0E9; color: #fff;
+            border-radius: 50%; width: 17px; height: 17px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700; flex-shrink: 0;
+        }
+        .step-arrow { color: #333; }
+
+        /* ── Canvas ──────────────────────────────────────────── */
+        .canvas-wrap {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px 0;
+        }
+        .col { flex: 1; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+        .col-header {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; padding: 6px 10px; border-radius: 4px;
+        }
+        .col-header-a { background: #091428; color: #7ab8ff; border-left: 3px solid #00A0E9; }
+        .col-header-s { background: #120828; color: #c07aff; border-left: 3px solid #8040e0; }
+
+        /* Cards */
+        .card {
+            padding: 10px 12px; border-radius: 6px; cursor: pointer;
+            transition: all 0.18s; border: 2px solid transparent; position: relative;
+        }
+        /* Agenda cards */
+        .card-a { background: #0a1428; border-color: #152040; }
+        .card-a:hover { background: #0e1c38; border-color: #2a4a8a; }
+        .card-a.selected { background: #0d2060; border-color: #00A0E9; box-shadow: 0 0 10px rgba(0,160,233,.25); }
+        .card-a.has-conn { border-color: #1a3a1a; }
+        .card-a.selected.has-conn { border-color: #00A0E9; }
+        /* Solution cards */
+        .card-s { background: #120828; border-color: #1e1040; }
+        .card-s:hover { background: #1a0e38; border-color: #4a2a8a; }
+        .card-s.linked { border-color: #2a8040; box-shadow: 0 0 8px rgba(0,180,80,.15); }
+        .card-s.can-connect { border-color: #8040e0; background: #1e0e48; box-shadow: 0 0 8px rgba(128,64,224,.2); }
+
+        .card-id { font-size: 10px; font-weight: 700; opacity: .65; margin-bottom: 3px; }
+        .card-a .card-id { color: #7ab8ff; }
+        .card-s .card-id { color: #c07aff; }
+        .card-title { font-size: 13px; font-weight: 700; color: #e0e0e0; margin-bottom: 2px; }
+        .card-desc  { font-size: 11px; color: #777; line-height: 1.4; }
+        .card-badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
+        .badge { font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 700; }
+        .badge-high   { background: #4a1010; color: #ff8080; }
+        .badge-medium { background: #3a2800; color: #ffc66b; }
+        .badge-low    { background: #102030; color: #6bb8ff; }
+        .hint-tag {
+            font-size: 10px; font-weight: 400; margin-left: 6px;
+        }
+        .hint-linked { color: #6fdc8c; }
+        .hint-can    { color: #aa80ff; }
+
+        /* Center column */
+        .col-center {
+            width: 90px; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center;
+            padding-top: 44px; gap: 6px;
+        }
+        .center-bubble {
+            background: #0f2040; border: 2px solid #00A0E9;
+            border-radius: 50%; width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 700; color: #00A0E9;
+        }
+        .center-lbl { font-size: 10px; color: #555; text-align: center; }
+
+        /* ── Connections table ──────────────────────────────── */
+        .conn-section { padding: 16px 20px 20px; }
+        .section-hd {
+            font-size: 11px; font-weight: 700; color: #666;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 10px; padding-bottom: 6px;
+            border-bottom: 1px solid #1e1e3a;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cnt-badge {
+            background: #0f2040; color: #00A0E9;
+            font-size: 11px; padding: 1px 8px; border-radius: 10px;
+        }
+        .conn-empty { color: #444; font-size: 12px; padding: 20px; text-align: center; line-height: 1.8; }
+        table.conn-tbl { width: 100%; border-collapse: collapse; }
+        table.conn-tbl th {
+            font-size: 10px; color: #555; text-align: left;
+            padding: 4px 8px; border-bottom: 1px solid #1e1e3a;
+        }
+        .cr { border-bottom: 1px solid #151528; transition: background .15s; }
+        .cr:hover { background: #141428; }
+        .cr td { padding: 7px 8px; font-size: 12px; vertical-align: middle; }
+        .lbl-a { color: #7ab8ff; font-weight: 700; white-space: nowrap; }
+        .lbl-s { color: #c07aff; font-weight: 700; white-space: nowrap; }
+        .sep    { color: #444; padding: 0 4px; }
+        .pri-btn {
+            padding: 3px 10px; border-radius: 10px;
+            font-size: 11px; font-weight: 700; cursor: pointer; border: none;
+            transition: opacity .18s;
+        }
+        .pri-btn:hover { opacity: .8; }
+        .note-inp {
+            background: #0d0d20; border: 1px solid #1e1e3a;
+            color: #bbb; font-size: 11px; padding: 4px 8px; border-radius: 4px;
+            width: 220px; font-family: inherit;
+        }
+        .note-inp:focus { outline: none; border-color: #3a3a6a; }
+        .del-btn {
+            background: transparent; color: #444;
+            border: 1px solid #2a2a2a; border-radius: 4px;
+            cursor: pointer; padding: 2px 8px; font-size: 12px;
+            transition: all .18s;
+        }
+        .del-btn:hover { color: #ff6b6b; border-color: #ff6b6b; }
+
+        /* ── Modal ───────────────────────────────────────────── */
+        .modal-bg {
+            position: fixed; inset: 0; background: rgba(0,0,0,.78);
+            z-index: 200; display: none; align-items: center; justify-content: center;
+        }
+        .modal-bg.open { display: flex; }
+        .modal {
+            background: #13142a; border: 1px solid #2a2a5a; border-radius: 8px;
+            padding: 24px; max-width: 680px; width: 92%; max-height: 82vh;
+            overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+        }
+        .modal-title { font-size: 16px; font-weight: 700; }
+        .modal-sub { font-size: 12px; color: #888; line-height: 1.6; }
+        .modal-body {
+            background: #0d0e20; border: 1px solid #1e1e3a; border-radius: 6px;
+            padding: 14px; font-size: 12px; color: #bbb; line-height: 1.8;
+            white-space: pre-wrap; font-family: 'Courier New', monospace;
+        }
+        .modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-copy {
+            background: #00A0E9; color: #fff; border: none;
+            padding: 8px 20px; border-radius: 4px; font-size: 13px; font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-copy:hover { background: #0080c0; }
+        .btn-close2 {
+            background: transparent; color: #888; border: 1px solid #444;
+            padding: 8px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;
+        }
+        .btn-close2:hover { color: #ccc; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div>
+        <div class="header-title">戦略カンバス：経営アジェンダ × ソリューション マッピング</div>
+        <div class="header-subtitle">労働金庫様向け タブレット活用ソリューション提案</div>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-back" onclick="location.href='index.html'">← スライドビューワー</button>
+        <button class="btn btn-agenda" onclick="showModal('agenda')">📊 アジェンダ視点で分析</button>
+        <button class="btn btn-sol"    onclick="showModal('solution')">💡 ソリューション視点で分析</button>
+        <button class="btn btn-export" onclick="exportMarkdown()">📤 マッピングをエクスポート<span class="export-ok" id="expOk"></span></button>
+    </div>
+</div>
+
+<!-- Step guide -->
+<div class="step-guide">
+    <div class="step"><div class="step-num">1</div><span>各エージェントボタンでClaudeに分析させる</span></div>
+    <span class="step-arrow">→</span>
+    <div class="step"><div class="step-num">2</div><span>左の<strong style="color:#ccc">経営アジェンダ</strong>をクリックして選択</span></div>
+    <span class="step-arrow">→</span>
+    <div class="step"><div class="step-num">3</div><span>右の<strong style="color:#ccc">ソリューション</strong>をクリックして接続</span></div>
+    <span class="step-arrow">→</span>
+    <div class="step"><div class="step-num">4</div><span>優先度・メモを入力してエクスポート → Claudeに反映依頼</span></div>
+</div>
+
+<!-- Canvas -->
+<div class="canvas-wrap">
+    <!-- Agenda column -->
+    <div class="col">
+        <div class="col-header col-header-a">経営アジェンダ（顧客の課題・機会）</div>
+        <div id="agendaCards"></div>
+    </div>
+
+    <!-- Center indicator -->
+    <div class="col-center">
+        <div class="center-lbl">接続数</div>
+        <div class="center-bubble" id="connBubble">0</div>
+        <div class="center-lbl">件</div>
+    </div>
+
+    <!-- Solution column -->
+    <div class="col">
+        <div class="col-header col-header-s">ソリューション（NTTデータの提供価値）</div>
+        <div id="solutionCards"></div>
+    </div>
+</div>
+
+<!-- Connections table -->
+<div class="conn-section">
+    <div class="section-hd">
+        接続マッピング一覧
+        <span class="cnt-badge" id="cntBadge">0件</span>
+    </div>
+    <div id="connContent"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg" onclick="bgClose(event)">
+    <div class="modal">
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-sub" id="modalSub"></div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+            <button class="btn-close2" onclick="closeModal()">閉じる</button>
+            <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">📋 プロンプトをコピー</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── データ ─────────────────────────────────────────────────────
+const AGENDA = [
+    { id:'A1', title:'トップライン向上',    desc:'貸出金利息・役務収益の強化' },
+    { id:'A2', title:'人的資本の最大化',    desc:'提案スキル標準化・生産性向上' },
+    { id:'A3', title:'次世代メインバンク化', desc:'LTV最大化・顧客基盤の維持拡大' },
+    { id:'A4', title:'組合員との関係性強化', desc:'信頼関係・メインバンク地位の確立' },
+    { id:'A5', title:'デジタルシフト対応',   desc:'非対面チャネルとの連携・共存' },
+    { id:'A6', title:'収益構造の改革',      desc:'新収益源開拓・コスト構造最適化' },
+];
+
+const SOLUTION = [
+    { id:'S1', title:'タブレット探査機',     desc:'現場ヒアリング・顧客ニーズの可視化' },
+    { id:'S2', title:'情報ハブ構築',         desc:'非対面↔対面データ連携基盤' },
+    { id:'S3', title:'5ステップ戦略',        desc:'接点獲得→関係性強化の段階的アプローチ' },
+    { id:'S4', title:'セキュリティ基盤',     desc:'コンプライアンス・安全なデータ管理' },
+    { id:'S5', title:'パーソナライズ提案',   desc:'顧客データ活用による最適提案生成' },
+    { id:'S6', title:'ライフプラン提案',     desc:'長期的な資産形成・関係性深化' },
+    { id:'S7', title:'ワークショップ導入',   desc:'現場を巻き込んだ変革支援プロセス' },
+];
+
+const PRI_ORDER  = ['high','medium','low'];
+const PRI_LABEL  = { high:'優先度：高', medium:'優先度：中', low:'優先度：低' };
+const PRI_STYLE  = {
+    high:   'background:#4a1010;color:#ff8080',
+    medium: 'background:#3a2800;color:#ffc66b',
+    low:    'background:#102030;color:#6bb8ff',
+};
+const BADGE_CLS = { high:'badge-high', medium:'badge-medium', low:'badge-low' };
+
+const SK = 'strategy_canvas_v2';
+
+// ── 状態 ──────────────────────────────────────────────────────
+let selectedA = null;  // agenda index | null
+let conns = [];        // [{ai, si, priority, note}]
+
+function load() {
+    try { const s = JSON.parse(localStorage.getItem(SK)); if (s?.conns) conns = s.conns; }
+    catch(_) {}
+}
+function save() { localStorage.setItem(SK, JSON.stringify({conns})); }
+
+// ── 操作 ──────────────────────────────────────────────────────
+function selectA(i) {
+    selectedA = (selectedA === i) ? null : i;
+    render();
+}
+
+function toggleConn(si) {
+    if (selectedA === null) return;
+    const ai = selectedA;
+    const idx = conns.findIndex(c => c.ai === ai && c.si === si);
+    if (idx >= 0) conns.splice(idx, 1);
+    else conns.push({ ai, si, priority: 'high', note: '' });
+    save(); render();
+}
+
+function cyclePri(idx) {
+    const c = conns[idx];
+    c.priority = PRI_ORDER[(PRI_ORDER.indexOf(c.priority) + 1) % 3];
+    save(); render();
+}
+function setNote(idx, v) { conns[idx].note = v; save(); }
+function delConn(idx)    { conns.splice(idx, 1); save(); render(); }
+
+function connsForA(ai) { return conns.filter(c => c.ai === ai); }
+function connsForS(si) { return conns.filter(c => c.si === si); }
+function isLinked(ai, si) { return conns.some(c => c.ai === ai && c.si === si); }
+
+// ── レンダリング ──────────────────────────────────────────────
+function render() {
+    renderA(); renderS(); renderConns();
+    document.getElementById('connBubble').textContent = conns.length;
+    document.getElementById('cntBadge').textContent   = conns.length + '件';
+}
+
+function renderA() {
+    const box = document.getElementById('agendaCards');
+    box.innerHTML = '';
+    AGENDA.forEach((item, i) => {
+        const cs  = connsForA(i);
+        const sel = selectedA === i;
+        const has = cs.length > 0;
+        const div = document.createElement('div');
+        div.className = 'card card-a' + (sel ? ' selected' : '') + (has ? ' has-conn' : '');
+        div.onclick = () => selectA(i);
+        const badges = cs.map(c =>
+            `<span class="badge ${BADGE_CLS[c.priority]}">${SOLUTION[c.si].id}</span>`
+        ).join('');
+        div.innerHTML = `
+            <div class="card-id">${item.id}</div>
+            <div class="card-title">${item.title}</div>
+            <div class="card-desc">${item.desc}</div>
+            ${has ? `<div class="card-badges">${badges}</div>` : ''}
+        `;
+        box.appendChild(div);
+    });
+}
+
+function renderS() {
+    const box = document.getElementById('solutionCards');
+    box.innerHTML = '';
+    SOLUTION.forEach((item, si) => {
+        const cs  = connsForS(si);
+        const linked = selectedA !== null && isLinked(selectedA, si);
+        const canConnect = selectedA !== null && !linked;
+        const has = cs.length > 0;
+        const div = document.createElement('div');
+        div.className = 'card card-s' + (linked ? ' linked' : (canConnect ? ' can-connect' : '')) + (has ? ' connected' : '');
+        div.onclick = () => toggleConn(si);
+        const badges = cs.map(c =>
+            `<span class="badge ${BADGE_CLS[c.priority]}">${AGENDA[c.ai].id}</span>`
+        ).join('');
+        const hint = linked
+            ? `<span class="hint-tag hint-linked">✓ 接続中（クリックで解除）</span>`
+            : (canConnect ? `<span class="hint-tag hint-can">+ クリックで接続</span>` : '');
+        div.innerHTML = `
+            <div class="card-id">${item.id}${hint}</div>
+            <div class="card-title">${item.title}</div>
+            <div class="card-desc">${item.desc}</div>
+            ${has ? `<div class="card-badges">${badges}</div>` : ''}
+        `;
+        box.appendChild(div);
+    });
+}
+
+function renderConns() {
+    const box = document.getElementById('connContent');
+    if (conns.length === 0) {
+        box.innerHTML = `<div class="conn-empty">まだ接続がありません。<br>
+            ① 左の経営アジェンダをクリックして選択<br>
+            ② 右のソリューションをクリックして接続を作成</div>`;
+        return;
+    }
+    const tbl = document.createElement('table');
+    tbl.className = 'conn-tbl';
+    tbl.innerHTML = `<thead><tr>
+        <th>経営アジェンダ</th><th></th><th>ソリューション</th>
+        <th>優先度</th><th>メモ・接続の根拠</th><th>操作</th>
+    </tr></thead><tbody id="ctbody"></tbody>`;
+    box.innerHTML = '';
+    box.appendChild(tbl);
+    const tbody = document.getElementById('ctbody');
+    conns.forEach((c, idx) => {
+        const a = AGENDA[c.ai], s = SOLUTION[c.si];
+        const tr = document.createElement('tr');
+        tr.className = 'cr';
+        tr.innerHTML = `
+            <td><span class="lbl-a">${a.id} ${a.title}</span></td>
+            <td class="sep">↔</td>
+            <td><span class="lbl-s">${s.id} ${s.title}</span></td>
+            <td>
+                <button class="pri-btn" style="${PRI_STYLE[c.priority]}"
+                    onclick="cyclePri(${idx})">${PRI_LABEL[c.priority]}</button>
+            </td>
+            <td>
+                <input type="text" class="note-inp"
+                    value="${c.note.replace(/"/g,'&quot;')}"
+                    placeholder="接続の根拠・コンサルの意見など..."
+                    oninput="setNote(${idx}, this.value)">
+            </td>
+            <td><button class="del-btn" onclick="delConn(${idx})">削除</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// ── エクスポート ───────────────────────────────────────────────
+function exportMarkdown() {
+    const now = new Date().toLocaleString('ja-JP');
+    let md = `# 戦略カンバス：アジェンダ × ソリューション マッピング\n生成日時: ${now}\n\n`;
+
+    if (conns.length === 0) {
+        md += '（接続なし）\n';
+    } else {
+        md += '## マッピング結果\n\n';
+        AGENDA.forEach((a, ai) => {
+            const cs = connsForA(ai);
+            if (!cs.length) return;
+            md += `### ${a.id} ${a.title}\n> ${a.desc}\n\n`;
+            cs.sort((x,y) => PRI_ORDER.indexOf(x.priority) - PRI_ORDER.indexOf(y.priority));
+            cs.forEach(c => {
+                const s = SOLUTION[c.si];
+                md += `- **${s.id} ${s.title}** ［${PRI_LABEL[c.priority]}］`;
+                if (c.note) md += `\n  > ${c.note}`;
+                md += '\n';
+            });
+            md += '\n';
+        });
+        // Unmapped
+        const unmappedA = AGENDA.filter((_, i) => !connsForA(i).length);
+        const unmappedS = SOLUTION.filter((_, i) => !connsForS(i).length);
+        if (unmappedA.length) {
+            md += `## 未接続の経営アジェンダ（カバーできていない課題）\n`;
+            unmappedA.forEach(a => md += `- ${a.id} ${a.title}\n`);
+            md += '\n';
+        }
+        if (unmappedS.length) {
+            md += `## 未接続のソリューション（未活用の価値）\n`;
+            unmappedS.forEach(s => md += `- ${s.id} ${s.title}\n`);
+            md += '\n';
+        }
+    }
+
+    md += `---\n## Claudeへの取り込み依頼\n\n`;
+    md += `上記マッピングを元に以下を実施してください：\n`;
+    md += `1. 優先度「高」の接続を最優先でスライドに反映する\n`;
+    md += `2. アジェンダとソリューションの対応関係を明示するスライドを追加・更新する\n`;
+    md += `3. メモの内容をスライドのメッセージに組み込む\n`;
+    md += `4. 未接続のアジェンダについてカバーできるソリューション説明を補強する\n`;
+
+    navigator.clipboard.writeText(md).then(() => {
+        const el = document.getElementById('expOk');
+        el.textContent = ' ✓ コピー完了';
+        setTimeout(() => el.textContent = '', 3000);
+    }).catch(() => {
+        const w = window.open('', '_blank');
+        w.document.write('<pre style="padding:20px;font-family:monospace;white-space:pre-wrap">' +
+            md.replace(/</g,'&lt;') + '</pre>');
+    });
+}
+
+// ── モーダル（エージェントプロンプト） ───────────────────────────
+const PROMPTS = {
+    agenda: {
+        title: '📊 アジェンダエージェント — 分析プロンプト',
+        sub:  'このプロンプトをコピーして、Claude（新しいチャットまたはこのチャット）に貼り付けてください。\n経営アジェンダの視点から提案を深掘りし、スライドへの改善案を出力します。',
+        body: `あなたは「アジェンダエージェント」として動作します。
+
+【役割】
+労働金庫の経営層・意思決定者の視点から、タブレット活用提案の
+価値・課題・不足点を評価します。
+
+【提案のサマリー】
+- 対面チャネルの価値最大化によるトップライン向上戦略
+- タブレットを「探査機」として活用し、顧客ニーズを可視化
+- 5ステップで接点獲得→関係性強化を実現
+- NTTデータのセキュアなデータ連携基盤を活用
+
+【分析対象の経営アジェンダ】
+A1: トップライン向上（貸出金利息・役務収益の強化）
+A2: 人的資本の最大化（提案スキル標準化・生産性向上）
+A3: 次世代メインバンク化（LTV最大化・顧客基盤維持拡大）
+A4: 組合員との関係性強化（信頼関係・メインバンク地位確立）
+A5: デジタルシフト対応（非対面チャネルとの連携・共存）
+A6: 収益構造の改革（新収益源開拓・コスト構造最適化）
+
+【各アジェンダについて分析してください】
+1. 現状の提案での対応度（強い / 弱い / 不足）
+2. 経営会議で問われそうな問いと、その答え
+3. このアジェンダを強化するために追加・修正すべきスライド内容
+4. 数値・KPIで示せる指標の提案
+
+【出力形式】
+FEEDBACK.mdに貼り付けられる形式でMarkdown出力してください。
+各アジェンダをH3見出しで整理してください。`,
+    },
+    solution: {
+        title: '💡 ソリューションエージェント — 分析プロンプト',
+        sub:  'このプロンプトをコピーして、Claude（新しいチャットまたはこのチャット）に貼り付けてください。\nソリューションの価値・実現性の視点から提案を強化します。',
+        body: `あなたは「ソリューションエージェント」として動作します。
+
+【役割】
+NTTデータのタブレット活用ソリューションの機能・価値・実現性の
+視点から、提案を評価・強化します。
+
+【現在のソリューション構成】
+S1: タブレット探査機 — 現場ヒアリング・顧客ニーズの可視化
+S2: 情報ハブ構築   — 非対面↔対面データ連携基盤
+S3: 5ステップ戦略  — 接点獲得→関係性強化の段階的アプローチ
+S4: セキュリティ基盤 — コンプライアンス・安全なデータ管理
+S5: パーソナライズ提案 — 顧客データ活用による最適提案生成
+S6: ライフプラン提案 — 長期的な資産形成・関係性深化
+S7: ワークショップ導入 — 現場を巻き込んだ変革支援プロセス
+
+【各ソリューションについて分析してください】
+1. 現在の提案での説明の強さ（1〜5点）と理由
+2. 他社・自社開発との比較における差別化ポイント
+3. 想定される顧客の懸念と、それへの回答
+4. スライドを強化するための具体的な改善案
+
+【追加で分析してください】
+- 現在の提案で言及していないが重要な潜在価値
+- 実装の現実性・段階的導入シナリオ
+- ROI試算のフレームワーク（概算）
+
+【出力形式】
+FEEDBACK.mdに貼り付けられる形式でMarkdown出力してください。
+各ソリューションをH3見出しで整理してください。`,
+    },
+};
+
+let currentPrompt = '';
+
+function showModal(type) {
+    const p = PROMPTS[type];
+    document.getElementById('modalTitle').textContent = p.title;
+    document.getElementById('modalSub').textContent   = p.sub;
+    document.getElementById('modalBody').textContent  = p.body;
+    document.getElementById('copyBtn').textContent    = '📋 プロンプトをコピー';
+    currentPrompt = p.body;
+    document.getElementById('modalBg').classList.add('open');
+}
+function closeModal()        { document.getElementById('modalBg').classList.remove('open'); }
+function bgClose(e)          { if (e.target === document.getElementById('modalBg')) closeModal(); }
+function copyPrompt() {
+    navigator.clipboard.writeText(currentPrompt).then(() => {
+        document.getElementById('copyBtn').textContent = '✓ コピーしました！';
+        setTimeout(() => document.getElementById('copyBtn').textContent = '📋 プロンプトをコピー', 2200);
+    });
+}
+
+// ── 初期化 ────────────────────────────────────────────────────
+load();
+render();
+</script>
+</body>
+</html>
