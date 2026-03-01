@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ギャップ補強ワークショップ｜労働金庫タブレット提案</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: #0d0d1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* ── Top bar ──────────────────────── */
+        .topbar {
+            background: #002060;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #00A0E9;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar h1 { font-size: 14px; font-weight: 700; color: #fff; }
+        .topbar-right { display: flex; gap: 10px; align-items: center; }
+        .top-btn {
+            background: transparent;
+            border: 1px solid #00A0E9;
+            color: #00A0E9;
+            padding: 5px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            transition: background 0.2s;
+        }
+        .top-btn:hover { background: #002a6a; }
+
+        /* ── Layout ───────────────────────── */
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 49px);
+        }
+
+        /* ── Left nav ─────────────────────── */
+        .nav {
+            width: 220px;
+            background: #0a0a18;
+            border-right: 1px solid #1a1a3a;
+            flex-shrink: 0;
+            padding: 16px 0;
+            position: sticky;
+            top: 49px;
+            height: calc(100vh - 49px);
+            overflow-y: auto;
+        }
+        .nav-section { padding: 0 12px 8px; font-size: 9px; color: #556; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+        .nav-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.15s;
+            position: relative;
+        }
+        .nav-item:hover { background: #1a1a3a; }
+        .nav-item.active { background: #0a1a3a; border-left-color: #00A0E9; }
+        .nav-label { font-size: 12px; font-weight: 700; color: #ccc; line-height: 1.3; }
+        .nav-item.active .nav-label { color: #fff; }
+        .nav-badge {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #2a3a2a;
+        }
+        .nav-badge.done { background: #4ddc8c; }
+        .nav-badge.partial { background: #f0a030; }
+        .gap-tag {
+            display: inline-block;
+            font-size: 9px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-bottom: 3px;
+            font-weight: 700;
+        }
+        .tag-agenda { background: #1a2a4a; color: #6bb8ff; }
+        .tag-solution { background: #1a2a1a; color: #6fdc8c; }
+
+        /* ── Main content ─────────────────── */
+        .main { flex: 1; padding: 28px 32px; max-width: 900px; }
+
+        /* ── Gap card ─────────────────────── */
+        .gap-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .gap-icon {
+            width: 56px; height: 56px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .gap-icon.agenda { background: #0a1a3a; }
+        .gap-icon.solution { background: #0a2a1a; }
+        .gap-title { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .gap-subtitle { font-size: 13px; color: #888; line-height: 1.5; }
+
+        .weakness-box {
+            background: #1a0a0a;
+            border: 1px solid #4a1a1a;
+            border-left: 4px solid #cc4444;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #cc8888;
+            line-height: 1.7;
+        }
+        .weakness-box strong { color: #ff8888; }
+
+        /* ── Input blocks ─────────────────── */
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #00A0E9;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #1a2a3a;
+        }
+        .input-group { margin-bottom: 14px; }
+        .input-label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .input-hint { font-size: 11px; color: #666; margin-top: 3px; }
+        input[type="number"], input[type="text"], textarea, select {
+            width: 100%;
+            background: #0d1a2a;
+            border: 1px solid #2a3a4a;
+            color: #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color 0.15s;
+            outline: none;
+        }
+        input:focus, textarea:focus, select:focus { border-color: #00A0E9; }
+        textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+        select option { background: #0d1a2a; }
+
+        .input-row { display: flex; gap: 12px; }
+        .input-row .input-group { flex: 1; }
+
+        /* ── Result box ───────────────────── */
+        .result-section {
+            background: #071a0e;
+            border: 1px solid #1a4a2a;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+        .result-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #4ddc8c;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .result-output {
+            background: #030f07;
+            border: 1px solid #1a3a2a;
+            border-radius: 5px;
+            padding: 14px;
+            font-size: 13px;
+            color: #b0e0c0;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            font-family: inherit;
+            min-height: 100px;
+        }
+        .result-output.empty { color: #446; font-style: italic; }
+
+        .calc-btn {
+            background: #003a20;
+            border: 1px solid #00A060;
+            color: #4ddc8c;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 16px;
+            transition: background 0.2s;
+        }
+        .calc-btn:hover { background: #005a30; }
+        .copy-btn {
+            background: #001a40;
+            border: 1px solid #00A0E9;
+            color: #6bb8ff;
+            padding: 6px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            transition: background 0.2s;
+            margin-left: auto;
+        }
+        .copy-btn:hover { background: #002a60; }
+
+        /* ── Checklist ────────────────────── */
+        .checklist { list-style: none; margin-bottom: 16px; }
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a2a;
+            font-size: 13px;
+            color: #ccc;
+        }
+        .checklist li:last-child { border-bottom: none; }
+        .checklist input[type="checkbox"] {
+            width: 16px; height: 16px;
+            flex-shrink: 0;
+            accent-color: #00A0E9;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+        .check-label { flex: 1; line-height: 1.5; }
+        .check-label small { display: block; color: #666; font-size: 11px; margin-top: 2px; }
+
+        /* ── Persona builder ──────────────── */
+        .persona-card {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .persona-card-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #00A0E9;
+            margin-bottom: 10px;
+        }
+        .persona-output-box {
+            background: #030d1a;
+            border: 1px solid #1a2a3a;
+            border-radius: 5px;
+            padding: 12px;
+            font-size: 12px;
+            color: #88b8dd;
+            line-height: 1.7;
+            min-height: 80px;
+            white-space: pre-wrap;
+        }
+
+        /* ── Tab system inside gap ────────── */
+        .gap-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+        .gap-tab {
+            padding: 7px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            color: #888;
+            border: 1px solid #1a2a3a;
+            border-bottom: none;
+            background: #0d0d1a;
+            transition: all 0.15s;
+        }
+        .gap-tab.active { background: #0d1a2a; color: #00A0E9; border-color: #1a3a5a; }
+        .gap-tab-content { display: none; }
+        .gap-tab-content.active { display: block; }
+
+        /* ── Divider / Back/Next ──────────── */
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid #1a1a3a;
+        }
+        .nf-btn {
+            background: #002060;
+            border: 1px solid #00A0E9;
+            color: #00A0E9;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: background 0.2s;
+        }
+        .nf-btn:hover { background: #003080; }
+        .nf-btn:disabled { opacity: 0.3; cursor: default; }
+
+        /* ── Progress bar ─────────────────── */
+        .progress-bar {
+            height: 3px;
+            background: #1a1a3a;
+            position: sticky;
+            top: 49px;
+            z-index: 99;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #002060, #00A0E9);
+            transition: width 0.4s ease;
+        }
+
+        /* ── Export final ─────────────────── */
+        .export-card {
+            background: #071220;
+            border: 2px solid #00A0E9;
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+        }
+        .export-card h2 { font-size: 20px; color: #fff; margin-bottom: 8px; }
+        .export-card p { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.6; }
+        .big-export-btn {
+            background: #00A0E9;
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .big-export-btn:hover { background: #0080c0; }
+        .export-area {
+            background: #030d1a;
+            border: 1px solid #1a2a3a;
+            border-radius: 5px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #88aacc;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            text-align: left;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* hidden pages */
+        .gap-page { display: none; }
+        .gap-page.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <h1>ギャップ補強ワークショップ — 6つの弱点を潰す</h1>
+    <div class="topbar-right">
+        <button class="top-btn" onclick="location.href='index.html'">← スライドビューワー</button>
+        <button class="top-btn" onclick="location.href='strategy-canvas.html'">🗺 戦略カンバス</button>
+    </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:14%"></div></div>
+
+<div class="layout">
+
+    <!-- Left nav -->
+    <nav class="nav">
+        <div class="nav-section">経営アジェンダ側の穴</div>
+
+        <div class="nav-item active" onclick="goTo(0)" id="nav0">
+            <div class="gap-tag tag-agenda">A1</div>
+            <div class="nav-label">収益試算の追加</div>
+            <div class="nav-badge" id="badge0"></div>
+        </div>
+        <div class="nav-item" onclick="goTo(1)" id="nav1">
+            <div class="gap-tag tag-agenda">A3</div>
+            <div class="nav-label">LTVモデルの構築</div>
+            <div class="nav-badge" id="badge1"></div>
+        </div>
+        <div class="nav-item" onclick="goTo(2)" id="nav2">
+            <div class="gap-tag tag-agenda">A6</div>
+            <div class="nav-label">ROI投資対効果</div>
+            <div class="nav-badge" id="badge2"></div>
+        </div>
+
+        <div class="nav-section" style="margin-top:16px">ソリューション側の穴</div>
+
+        <div class="nav-item" onclick="goTo(3)" id="nav3">
+            <div class="gap-tag tag-solution">S2</div>
+            <div class="nav-label">情報ハブを業務視点で</div>
+            <div class="nav-badge" id="badge3"></div>
+        </div>
+        <div class="nav-item" onclick="goTo(4)" id="nav4">
+            <div class="gap-tag tag-solution">S4</div>
+            <div class="nav-label">セキュリティの具体化</div>
+            <div class="nav-badge" id="badge4"></div>
+        </div>
+        <div class="nav-item" onclick="goTo(5)" id="nav5">
+            <div class="gap-tag tag-solution">S5</div>
+            <div class="nav-label">パーソナライズを図解</div>
+            <div class="nav-badge" id="badge5"></div>
+        </div>
+
+        <div class="nav-section" style="margin-top:16px">完了</div>
+        <div class="nav-item" onclick="goTo(6)" id="nav6">
+            <div class="nav-label">📤 まとめてエクスポート</div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="main">
+
+        <!-- ═══════════════════════════════════════════════
+             PAGE 0  A1: 収益試算
+        ════════════════════════════════════════════════ -->
+        <div class="gap-page active" id="page0">
+            <div class="gap-header">
+                <div class="gap-icon agenda">💰</div>
+                <div>
+                    <div class="gap-title">A1 — 収益試算の追加</div>
+                    <div class="gap-subtitle">「トップライン向上」アジェンダに具体的な数値根拠を与える</div>
+                </div>
+            </div>
+            <div class="weakness-box">
+                <strong>現状の穴：</strong>「収益力を強化する」という方向性は語られているが、<br>
+                <strong>「いくら増えるか」の試算がゼロ</strong>。顧客は「感覚論」と判断してしまう。
+            </div>
+
+            <div class="section-title">① 現状ベースライン（現在の数値を入力）</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">渉外担当者数（名）</label>
+                    <input type="number" id="a1_staff" placeholder="例: 50" oninput="calcA1()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">現在の提案件数（件/月・1人あたり）</label>
+                    <input type="number" id="a1_proposals_now" placeholder="例: 8" oninput="calcA1()">
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">提案の成約率（%）</label>
+                    <input type="number" id="a1_conv" placeholder="例: 25" oninput="calcA1()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">1件あたり平均粗利（万円）</label>
+                    <input type="number" id="a1_margin" placeholder="例: 5" oninput="calcA1()">
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top:20px">② タブレット導入後の改善想定</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">提案件数の増加率（%）</label>
+                    <input type="number" id="a1_proposals_up" placeholder="例: 30" oninput="calcA1()">
+                    <div class="input-hint">ヒアリング精度向上・提案タイミング最適化による増加</div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">成約率の改善（%ポイント増）</label>
+                    <input type="number" id="a1_conv_up" placeholder="例: 5" oninput="calcA1()">
+                    <div class="input-hint">パーソナライズ提案によるニーズマッチ向上</div>
+                </div>
+            </div>
+
+            <button class="calc-btn" onclick="calcA1(true)">試算を計算する →</button>
+
+            <div class="result-section">
+                <div class="result-title">
+                    <span>📊 試算結果（スライド用コピー）</span>
+                    <button class="copy-btn" onclick="copyResult('a1_result')">クリップボードにコピー</button>
+                </div>
+                <div class="result-output empty" id="a1_result">← 上の数値を入力して「試算を計算する」を押してください</div>
+            </div>
+
+            <div class="nav-footer">
+                <button class="nf-btn" disabled>← 前へ</button>
+                <button class="nf-btn" onclick="goTo(1)">次へ →</button>
+            </div>
+        </div><!-- /page0 -->
+
+
+        <!-- ═══════════════════════════════════════════════
+             PAGE 1  A3: LTVモデル
+        ════════════════════════════════════════════════ -->
+        <div class="gap-page" id="page1">
+            <div class="gap-header">
+                <div class="gap-icon agenda">📈</div>
+                <div>
+                    <div class="gap-title">A3 — 顧客LTVモデルの構築</div>
+                    <div class="gap-subtitle">「次世代メインバンク化」アジェンダのLTV試算を可視化する</div>
+                </div>
+            </div>
+            <div class="weakness-box">
+                <strong>現状の穴：</strong>「LTVの最大化」という言葉は登場するが、<br>
+                <strong>現在のLTVと改善後のLTVの差分</strong>が示されていない。「なぜメインバンク化が重要か」の数値的根拠がない。
+            </div>
+
+            <div class="section-title">① 現状の顧客LTV（年間換算）</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">組合員の平均在籍年数（年）</label>
+                    <input type="number" id="ltv_years" placeholder="例: 25" oninput="calcLTV()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">現在の年間手数料収入（万円/人）</label>
+                    <input type="number" id="ltv_fee_now" placeholder="例: 3" oninput="calcLTV()">
+                </div>
+            </div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">貸出金利用率（%）</label>
+                    <input type="number" id="ltv_loan_rate" placeholder="例: 20" oninput="calcLTV()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">貸出1件あたり利息収入（万円/年）</label>
+                    <input type="number" id="ltv_loan_income" placeholder="例: 15" oninput="calcLTV()">
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top:20px">② メインバンク化後の改善想定</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">手数料収入の向上（万円/年）</label>
+                    <input type="number" id="ltv_fee_up" placeholder="例: 2" oninput="calcLTV()">
+                    <div class="input-hint">保険・投信・カードの追加契約による増収</div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">貸出利用率の向上（%ポイント増）</label>
+                    <input type="number" id="ltv_loan_up" placeholder="例: 8" oninput="calcLTV()">
+                    <div class="input-hint">ライフプラン提案によるローン獲得増</div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">在籍年数の延長（年）</label>
+                <input type="number" id="ltv_years_up" placeholder="例: 3" oninput="calcLTV()">
+                <div class="input-hint">関係性強化によるメインバンク継続効果</div>
+            </div>
+
+            <button class="calc-btn" onclick="calcLTV(true)">LTV試算を計算する →</button>
+
+            <div class="result-section">
+                <div class="result-title">
+                    <span>📊 LTV試算結果</span>
+                    <button class="copy-btn" onclick="copyResult('ltv_result')">クリップボードにコピー</button>
+                </div>
+                <div class="result-output empty" id="ltv_result">← 数値を入力して「LTV試算を計算する」を押してください</div>
+            </div>
+
+            <div class="nav-footer">
+                <button class="nf-btn" onclick="goTo(0)">← 前へ</button>
+                <button class="nf-btn" onclick="goTo(2)">次へ →</button>
+            </div>
+        </div><!-- /page1 -->
+
+
+        <!-- ═══════════════════════════════════════════════
+             PAGE 2  A6: ROI
+        ════════════════════════════════════════════════ -->
+        <div class="gap-page" id="page2">
+            <div class="gap-header">
+                <div class="gap-icon agenda">🔄</div>
+                <div>
+                    <div class="gap-title">A6 — ROI・投資対効果の可視化</div>
+                    <div class="gap-subtitle">「いつ元が取れるか」を示し、投資意思決定を後押しする</div>
+                </div>
+            </div>
+            <div class="weakness-box">
+                <strong>現状の穴：</strong>価値の訴求は強いが、<strong>初期投資・ランニングコスト・回収期間</strong>が一切示されていない。<br>
+                「費用対効果がわからないと稟議が通らない」という最大の意思決定ブロックに対処できていない。
+            </div>
+
+            <div class="section-title">① 導入コスト</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">初期導入費（万円）</label>
+                    <input type="number" id="roi_init" placeholder="例: 500" oninput="calcROI()">
+                    <div class="input-hint">タブレット拡張・基盤構築・初期設定</div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">月次ランニングコスト（万円/月）</label>
+                    <input type="number" id="roi_monthly" placeholder="例: 40" oninput="calcROI()">
+                    <div class="input-hint">ライセンス・保守・クラウド費用</div>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top:20px">② 効果（A1・A3の試算値を活用）</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">収益増加額（万円/年）</label>
+                    <input type="number" id="roi_income" placeholder="例: 1200" oninput="calcROI()">
+                    <div class="input-hint">A1の試算値をそのまま入力</div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">事務コスト削減額（万円/年）</label>
+                    <input type="number" id="roi_cost_save" placeholder="例: 300" oninput="calcROI()">
+                    <div class="input-hint">紙・移動・手入力削減（担当者◯時間×時給換算）</div>
+                </div>
+            </div>
+
+            <button class="calc-btn" onclick="calcROI(true)">ROIを計算する →</button>
+
+            <div class="result-section">
+                <div class="result-title">
+                    <span>📊 ROI試算結果</span>
+                    <button class="copy-btn" onclick="copyResult('roi_result')">クリップボードにコピー</button>
+                </div>
+                <div class="result-output empty" id="roi_result">← 数値を入力して「ROIを計算する」を押してください</div>
+            </div>
+
+            <div class="nav-footer">
+                <button class="nf-btn" onclick="goTo(1)">← 前へ</button>
+                <button class="nf-btn" onclick="goTo(3)">次へ →</button>
+            </div>
+        </div><!-- /page2 -->
+
+
+        <!-- ═══════════════════════════════════════════════
+             PAGE 3  S2: 情報ハブ（業務視点化）
+        ════════════════════════════════════════════════ -->
+        <div class="gap-page" id="page3">
+            <div class="gap-header">
+                <div class="gap-icon solution">🔗</div>
+                <div>
+                    <div class="gap-title">S2 — 情報ハブを業務視点で語り直す</div>
+                    <div class="gap-subtitle">「技術図」から「担当者の仕事がどう変わるか」の図へ転換</div>
+                </div>
+            </div>
+            <div class="weakness-box">
+                <strong>現状の穴：</strong>「非対面↔対面のデータ連携」という構造は図示されているが、<br>
+                <strong>「担当者の朝の仕事がどう変わるか」</strong>が語られていない。技術価値でなく業務価値で語る必要がある。
+            </div>
+
+            <div class="section-title">現在の業務フローを入力（「なし」→「あり」の比較を生成）</div>
+
+            <div class="input-group">
+                <label class="input-label">現在の担当者の情報収集方法（自由記述）</label>
+                <textarea id="s2_before" placeholder="例：&#10;・昨日の電話問い合わせ内容をExcelで確認&#10;・顧客の取引履歴は別システムにログインして確認&#10;・Webの閲覧履歴は把握できない&#10;・訪問前に30分かけて情報を手動でまとめる"></textarea>
+            </div>
+            <div class="input-group">
+                <label class="input-label">情報ハブ導入後に変わること（自由記述）</label>
+                <textarea id="s2_after" placeholder="例：&#10;・タブレットを開くと「今日訪問すべき組合員トップ5」が自動表示&#10;・Webで住宅ローンシミュレーションをした組合員に自動フラグ&#10;・前回の対話履歴・提案履歴がすぐ参照可能&#10;・情報収集に使っていた30分がゼロになる"></textarea>
+            </div>
+
+            <div class="section-title" style="margin-top:20px">接続する既存システム（チェックした項目を訴求に使う）</div>
+            <ul class="checklist" id="s2_systems">
+                <li><input type="checkbox" id="sys1" onchange="genS2()"><label class="check-label" for="sys1">勘定系システム<small>残高・取引履歴・口座情報</small></label></li>
+                <li><input type="checkbox" id="sys2" onchange="genS2()"><label class="check-label" for="sys2">CRM（顧客管理）<small>対話履歴・提案履歴・担当者情報</small></label></li>
+                <li><input type="checkbox" id="sys3" onchange="genS2()"><label class="check-label" for="sys3">Webポータル・組合員アプリ<small>閲覧行動・シミュレーション履歴</small></label></li>
+                <li><input type="checkbox" id="sys4" onchange="genS2()"><label class="check-label" for="sys4">コールセンター・問い合わせ履歴<small>電話・チャット対応記録</small></label></li>
+                <li><input type="checkbox" id="sys5" onchange="genS2()"><label class="check-label" for="sys5">財形・年金・給与データ<small>労働組合経由の福利厚生情報</small></label></li>
+            </ul>
+
+            <button class="calc-btn" onclick="genS2()">業務視点の説明文を生成する →</button>
+
+            <div class="result-section">
+                <div class="result-title">
+                    <span>📝 業務視点の情報ハブ説明（スライド用）</span>
+                    <button class="copy-btn" onclick="copyResult('s2_result')">クリップボードにコピー</button>
+                </div>
+                <div class="result-output empty" id="s2_result">← 入力後「説明文を生成する」を押してください</div>
+            </div>
+
+            <div class="nav-footer">
+                <button class="nf-btn" onclick="goTo(2)">← 前へ</button>
+                <button class="nf-btn" onclick="goTo(4)">次へ →</button>
+            </div>
+        </div><!-- /page3 -->
+
+
+        <!-- ═══════════════════════════════════════════════
+             PAGE 4  S4: セキュリティの具体化
+        ════════════════════════════════════════════════ -->
+        <div class="gap-page" id="page4">
+            <div class="gap-header">
+                <div class="gap-icon solution">🔒</div>
+                <div>
+                    <div class="gap-title">S4 — セキュリティを「証拠」で語る</div>
+                    <div class="gap-subtitle">「NTTデータだから安全」から「具体的にここが安全」へ</div>
+                </div>
+            </div>
+            <div class="weakness-box">
+                <strong>現状の穴：</strong>「ゼロトラスト」「MFA」などの技術用語は出るが、<br>
+                <strong>顧客の最大の不安「タブレットを紛失したら？」「金融庁の検査は？」</strong>への具体的な回答がない。
+            </div>
+
+            <div class="section-title">対応済みの対策をチェック（チェックした項目が訴求ポイントになる）</div>
+            <ul class="checklist" id="s4_checks">
+                <li><input type="checkbox" id="sec1" onchange="genS4()"><label class="check-label" for="sec1">リモートワイプ対応<small>紛失時に◯秒でデータ遠隔消去可能</small></label></li>
+                <li><input type="checkbox" id="sec2" onchange="genS4()"><label class="check-label" for="sec2">多要素認証（MFA）<small>生体認証＋デバイス認証の組み合わせ</small></label></li>
+                <li><input type="checkbox" id="sec3" onchange="genS4()"><label class="check-label" for="sec3">閉域網接続（インターネット非経由）<small>金融専用回線によるクラウド接続</small></label></li>
+                <li><input type="checkbox" id="sec4" onchange="genS4()"><label class="check-label" for="sec4">端末上にデータを保持しない<small>ゼロデータ端末設計、全データはクラウド側</small></label></li>
+                <li><input type="checkbox" id="sec5" onchange="genS4()"><label class="check-label" for="sec5">金融庁・監督指針への対応実績<small>◯機関での検査対応実績あり</small></label></li>
+                <li><input type="checkbox" id="sec6" onchange="genS4()"><label class="check-label" for="sec6">インシデント対応SLA<small>検知から◯分以内に対応チームが起動</small></label></li>
+                <li><input type="checkbox" id="sec7" onchange="genS4()"><label class="check-label" for="sec7">個人情報保護法・FISC安全対策基準準拠<small>金融業界標準のコンプライアンス対応</small></label></li>
+            </ul>
+
+            <div class="section-title" style="margin-top:16px">実績数値（わかる範囲で入力）</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">金融機関への導入実績（機関数）</label>
+                    <input type="number" id="sec_count" placeholder="例: 120" oninput="genS4()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">セキュリティ専門家の人数</label>
+                    <input type="number" id="sec_experts" placeholder="例: 2000" oninput="genS4()">
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">紛失時のリモートワイプ所要時間（秒/分）</label>
+                <input type="text" id="sec_wipe" placeholder="例: 30秒以内" oninput="genS4()">
+            </div>
+
+            <button class="calc-btn" onclick="genS4()">セキュリティ説明文を生成する →</button>
+
+            <div class="result-section">
+                <div class="result-title">
+                    <span>🔒 セキュリティ訴求文（Q&A形式）</span>
+                    <button class="copy-btn" onclick="copyResult('s4_result')">クリップボードにコピー</button>
+                </div>
+                <div class="result-output empty" id="s4_result">← チェックと数値を入力して「説明文を生成する」を押してください</div>
+            </div>
+
+            <div class="nav-footer">
+                <button class="nf-btn" onclick="goTo(3)">← 前へ</button>
+                <button class="nf-btn" onclick="goTo(5)">次へ →</button>
+            </div>
+        </div><!-- /page4 -->
+
+
+        <!-- ═══════════════════════════════════════════════
+             PAGE 5  S5: パーソナライズ提案の具体化
+        ════════════════════════════════════════════════ -->
+        <div class="gap-page" id="page5">
+            <div class="gap-header">
+                <div class="gap-icon solution">🎯</div>
+                <div>
+                    <div class="gap-title">S5 — パーソナライズ提案を「見える化」する</div>
+                    <div class="gap-subtitle">「どのデータを使って、何を提案するか」のシナリオを可視化</div>
+                </div>
+            </div>
+            <div class="weakness-box">
+                <strong>現状の穴：</strong>「パーソナライズ提案」という言葉はあるが、<br>
+                <strong>「Aさんに対して、何がどう変わるのか」が完全にブラックボックス</strong>。顧客はイメージできない。
+            </div>
+
+            <div class="section-title">① 仕組みの説明（インプット → 処理 → アウトプット）</div>
+            <div class="input-group">
+                <label class="input-label">使用するデータ（インプット）</label>
+                <textarea id="p_input" placeholder="例：&#10;・Webでシミュレーションした商品カテゴリ&#10;・勘定系から取得した預金残高・ローン残高&#10;・過去のヒアリング記録（子供の年齢・住宅計画）&#10;・最後に提案した商品と結果"></textarea>
+            </div>
+            <div class="input-group">
+                <label class="input-label">提案生成の仕組み（処理）</label>
+                <textarea id="p_logic" placeholder="例：&#10;・類似属性顧客の成約パターンと照合&#10;・ライフステージ×資産状況マトリクスで最適商品を選択&#10;・次回接触の「最適タイミング」を算出（◯ヶ月後）"></textarea>
+            </div>
+            <div class="input-group">
+                <label class="input-label">担当者の手元に届くもの（アウトプット）</label>
+                <textarea id="p_output" placeholder="例：&#10;・「今日のおすすめ提案TOP3」リスト&#10;・各提案の根拠（なぜこの組合員にこの商品か）&#10;・提案トーク例の自動生成&#10;・最適な話しかけのタイミング（誕生日・住宅契約月など）"></textarea>
+            </div>
+
+            <div class="section-title" style="margin-top:20px">② ペルソナ別の提案例（具体的なシナリオを登録）</div>
+            <div id="personaList"></div>
+            <button class="calc-btn" onclick="addPersona()" style="background:#0a1a2a;border-color:#00A0E9;color:#00A0E9">＋ ペルソナを追加</button>
+
+            <button class="calc-btn" style="margin-left:12px" onclick="genS5()">提案ストーリーを生成する →</button>
+
+            <div class="result-section">
+                <div class="result-title">
+                    <span>🎯 パーソナライズ提案シナリオ（スライド用）</span>
+                    <button class="copy-btn" onclick="copyResult('s5_result')">クリップボードにコピー</button>
+                </div>
+                <div class="result-output empty" id="s5_result">← 仕組みとペルソナを入力して「提案ストーリーを生成する」を押してください</div>
+            </div>
+
+            <div class="nav-footer">
+                <button class="nf-btn" onclick="goTo(4)">← 前へ</button>
+                <button class="nf-btn" onclick="goTo(6)">まとめてエクスポート →</button>
+            </div>
+        </div><!-- /page5 -->
+
+
+        <!-- ═══════════════════════════════════════════════
+             PAGE 6  Export
+        ════════════════════════════════════════════════ -->
+        <div class="gap-page" id="page6">
+            <div class="export-card">
+                <h2>全ギャップ補強データをエクスポート</h2>
+                <p>入力したすべての試算値・説明文・シナリオをまとめてMarkdown形式でコピーします。<br>FEEDBACK.md に貼り付けてClaudeにスライド更新を依頼できます。</p>
+                <button class="big-export-btn" onclick="exportAll()">📤 全データをMarkdownでコピー</button>
+            </div>
+            <div class="export-area" id="exportArea"></div>
+
+            <div style="margin-top:24px;padding:16px;background:#0a1020;border-radius:8px;border:1px solid #1a2a3a">
+                <div class="section-title">次のアクション</div>
+                <ol style="list-style:decimal;padding-left:20px;font-size:13px;color:#aaa;line-height:2.2">
+                    <li>上の「全データをMarkdownでコピー」でデータをコピー</li>
+                    <li><code style="background:#0d1a2a;padding:2px 6px;border-radius:3px;color:#88b8dd">FEEDBACK.md</code> に貼り付けてコミット（<code style="background:#0d1a2a;padding:2px 6px;border-radius:3px;color:#88b8dd">git add FEEDBACK.md && git commit</code>）</li>
+                    <li>Claudeに「FEEDBACK.mdの内容を元に以下スライドを更新してください」と依頼：<br>
+                        <span style="color:#4ddc8c">A1/A6 → slide05_management_agenda.html に数値追加</span><br>
+                        <span style="color:#4ddc8c">A3 → LTVスライド新規作成</span><br>
+                        <span style="color:#4ddc8c">S2 → slide08_tablet_hub.html を業務視点図に更新</span><br>
+                        <span style="color:#4ddc8c">S4 → slide09_security.html にQ&A追加</span><br>
+                        <span style="color:#4ddc8c">S5 → パーソナライズ提案スライドを新規作成</span>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="nav-footer">
+                <button class="nf-btn" onclick="goTo(5)">← 前へ</button>
+                <button class="nf-btn" disabled>完了</button>
+            </div>
+        </div><!-- /page6 -->
+
+    </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+
+// ── Navigation ─────────────────────────────────────────────────
+let currentPage = 0;
+const totalPages = 7;
+
+function goTo(n) {
+    document.querySelectorAll('.gap-page').forEach((el, i) => {
+        el.classList.toggle('active', i === n);
+    });
+    document.querySelectorAll('.nav-item').forEach((el, i) => {
+        el.classList.toggle('active', i === n);
+    });
+    currentPage = n;
+    const pct = Math.round(((n + 1) / totalPages) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    window.scrollTo(0, 0);
+    saveBadge(n);
+}
+
+function saveBadge(n) {
+    const badge = document.getElementById('badge' + n);
+    if (!badge) return;
+    const resultEl = document.getElementById(['a1_result','ltv_result','roi_result','s2_result','s4_result','s5_result'][n]);
+    if (resultEl && !resultEl.classList.contains('empty')) {
+        badge.classList.add('done');
+    }
+}
+
+// ── Copy helper ─────────────────────────────────────────────────
+function copyResult(id) {
+    const el = document.getElementById(id);
+    if (!el || el.classList.contains('empty')) return;
+    navigator.clipboard.writeText(el.textContent).then(() => {
+        const orig = el.previousElementSibling?.querySelector('.copy-btn');
+        // find copy btn in same result-title
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            if (btn.getAttribute('onclick') === `copyResult('${id}')`) {
+                const txt = btn.textContent;
+                btn.textContent = '✓ コピーしました';
+                setTimeout(() => btn.textContent = txt, 2000);
+            }
+        });
+    });
+}
+
+function fmt(n) { return n.toLocaleString('ja-JP'); }
+
+// ── A1: 収益試算 ────────────────────────────────────────────────
+function calcA1(force) {
+    const staff = +document.getElementById('a1_staff').value || 0;
+    const propNow = +document.getElementById('a1_proposals_now').value || 0;
+    const conv = +document.getElementById('a1_conv').value || 0;
+    const margin = +document.getElementById('a1_margin').value || 0;
+    const propUp = +document.getElementById('a1_proposals_up').value || 0;
+    const convUp = +document.getElementById('a1_conv_up').value || 0;
+
+    if (!staff || !propNow || !conv || !margin) return;
+
+    const currentAnnual = staff * propNow * 12 * (conv/100) * margin;
+    const newPropMonth = propNow * (1 + propUp/100);
+    const newConv = conv + convUp;
+    const newAnnual = staff * newPropMonth * 12 * (newConv/100) * margin;
+    const diff = newAnnual - currentAnnual;
+
+    const el = document.getElementById('a1_result');
+    el.classList.remove('empty');
+    el.textContent =
+`【A1 収益試算サマリー】
+
+■ 現状（試算ベースライン）
+  渉外担当者 ${staff}名 × ${propNow}件/月 × 成約率${conv}% × 粗利${margin}万円
+  → 年間収益: 約${fmt(Math.round(currentAnnual))}万円
+
+■ タブレット活用後（想定）
+  提案件数 +${propUp}%増 → ${propNow.toFixed(1)}件 → ${newPropMonth.toFixed(1)}件/月
+  成約率 +${convUp}pt → ${conv}% → ${newConv}%
+  → 年間収益: 約${fmt(Math.round(newAnnual))}万円
+
+■ 改善効果
+  年間収益増加: 約 +${fmt(Math.round(diff))}万円（+${Math.round((diff/currentAnnual)*100)}%）
+
+※ 本試算は概算です。実際の効果は金庫規模・商品構成により変動します。`;
+    saveBadge(0);
+}
+
+// ── A3: LTV試算 ────────────────────────────────────────────────
+function calcLTV(force) {
+    const years = +document.getElementById('ltv_years').value || 0;
+    const feeNow = +document.getElementById('ltv_fee_now').value || 0;
+    const loanRate = +document.getElementById('ltv_loan_rate').value || 0;
+    const loanIncome = +document.getElementById('ltv_loan_income').value || 0;
+    const feeUp = +document.getElementById('ltv_fee_up').value || 0;
+    const loanUp = +document.getElementById('ltv_loan_up').value || 0;
+    const yearsUp = +document.getElementById('ltv_years_up').value || 0;
+
+    if (!years || !feeNow) return;
+
+    const annualNow = feeNow + (loanRate/100) * loanIncome;
+    const ltvNow = annualNow * years;
+
+    const annualNew = (feeNow + feeUp) + ((loanRate + loanUp)/100) * loanIncome;
+    const ltvNew = annualNew * (years + yearsUp);
+    const diff = ltvNew - ltvNow;
+
+    const el = document.getElementById('ltv_result');
+    el.classList.remove('empty');
+    el.textContent =
+`【A3 顧客LTVモデル試算】
+
+■ 現状のLTV（1組合員あたり）
+  年間手数料収入: ${feeNow}万円
+  貸出利用率: ${loanRate}% × 利息収入${loanIncome}万円 = ${(loanRate/100*loanIncome).toFixed(1)}万円/年
+  年間合計収益: 約${annualNow.toFixed(1)}万円/年
+  在籍年数: ${years}年
+  → 現状LTV: 約${fmt(Math.round(ltvNow))}万円
+
+■ メインバンク化後のLTV（想定）
+  手数料収入向上: +${feeUp}万円/年
+  貸出利用率向上: +${loanUp}pt → ${loanRate+loanUp}%
+  在籍年数延長: +${yearsUp}年 → ${years+yearsUp}年
+  年間合計収益: 約${annualNew.toFixed(1)}万円/年
+  → 改善後LTV: 約${fmt(Math.round(ltvNew))}万円
+
+■ LTV改善効果（1組合員あたり）
+  +${fmt(Math.round(diff))}万円（+${Math.round((diff/ltvNow)*100)}%向上）
+
+■ 全組合員への換算（参考）
+  ※ 対象組合員数を入力してください → ___名 × ${fmt(Math.round(diff))}万円 = ___億円規模の潜在価値`;
+    saveBadge(1);
+}
+
+// ── A6: ROI ─────────────────────────────────────────────────────
+function calcROI(force) {
+    const init = +document.getElementById('roi_init').value || 0;
+    const monthly = +document.getElementById('roi_monthly').value || 0;
+    const income = +document.getElementById('roi_income').value || 0;
+    const save = +document.getElementById('roi_cost_save').value || 0;
+
+    if (!init) return;
+
+    const annualCost = monthly * 12;
+    const annualBenefit = income + save;
+    const netAnnual = annualBenefit - annualCost;
+    const payback = netAnnual > 0 ? (init / netAnnual) : null;
+    const roi3y = netAnnual > 0 ? Math.round(((netAnnual * 3 - init) / init) * 100) : null;
+
+    const el = document.getElementById('roi_result');
+    el.classList.remove('empty');
+    el.textContent =
+`【A6 ROI・投資対効果試算】
+
+■ 投資コスト
+  初期導入費: ${fmt(init)}万円
+  年間ランニング: ${fmt(monthly)}万円/月 × 12 = ${fmt(annualCost)}万円/年
+  3年間総コスト: ${fmt(init + annualCost * 3)}万円
+
+■ 年間効果
+  収益増加額: +${fmt(income)}万円/年（A1試算値）
+  事務コスト削減: -${fmt(save)}万円/年
+  年間純効果: ${fmt(netAnnual)}万円/年
+
+■ 投資回収
+  初期費用回収: ${payback ? `約${payback.toFixed(1)}年` : '計算できません（効果がコストを下回っています）'}
+  3年間ROI: ${roi3y !== null ? roi3y + '%' : 'N/A'}
+
+■ スライド用メッセージ
+「初期投資${fmt(init)}万円に対し、約${payback ? payback.toFixed(1) : '?'}年で回収。
+ 3年間で${roi3y !== null ? roi3y + '%' : '?'}のROIを想定。」
+
+※ 本試算は概算です。詳細はワークショップにてすり合わせを行います。`;
+    saveBadge(2);
+}
+
+// ── S2: 情報ハブ業務視点 ────────────────────────────────────────
+function genS2() {
+    const before = document.getElementById('s2_before').value.trim();
+    const after = document.getElementById('s2_after').value.trim();
+    const systems = [];
+    ['sys1','sys2','sys3','sys4','sys5'].forEach((id, i) => {
+        if (document.getElementById(id).checked) {
+            const labels = ['勘定系','CRM','Webポータル・アプリ','コールセンター履歴','財形・給与データ'];
+            systems.push(labels[i]);
+        }
+    });
+
+    if (!before && !after && systems.length === 0) return;
+
+    let text = `【S2 情報ハブ：業務視点での価値提示】\n\n`;
+    if (before) {
+        text += `■ 現在の担当者の情報収集（Before）\n${before}\n\n`;
+    }
+    if (after) {
+        text += `■ 情報ハブ導入後（After）\n${after}\n\n`;
+    }
+    if (systems.length > 0) {
+        text += `■ 接続する既存システム\n`;
+        systems.forEach(s => text += `  • ${s}\n`);
+        text += `\n`;
+        text += `■ スライドメッセージ案\n`;
+        text += `「${systems.join('・')}を一元化。\n`;
+        text += ` 担当者は訪問前の情報収集ゼロ分で最適な提案がすぐできる。」\n`;
+    }
+
+    const el = document.getElementById('s2_result');
+    el.classList.remove('empty');
+    el.textContent = text;
+    saveBadge(3);
+}
+
+// ── S4: セキュリティ具体化 ─────────────────────────────────────
+function genS4() {
+    const items = [
+        { id:'sec1', q:'タブレットを紛失した場合は？',     a: (v,d) => `リモートワイプ機能により${d.wipe || '◯秒'}以内にデータを遠隔消去できます。端末上に顧客データは保持しない設計です。` },
+        { id:'sec2', q:'不正アクセスへの対策は？',          a: () => `生体認証とデバイス認証を組み合わせた多要素認証（MFA）で、なりすましログインを防止します。` },
+        { id:'sec3', q:'インターネット経由でのデータ漏えいは？', a: () => `金融専用の閉域網を使用し、インターネットを経由しません。外部からの不正アクセスルートを原理的に遮断します。` },
+        { id:'sec4', q:'端末に残るデータが心配',              a: () => `ゼロデータ端末設計。すべてのデータはクラウド側に保存され、端末には顧客情報が残りません。` },
+        { id:'sec5', q:'金融庁の検査で問題にならないか？',     a: (v,d) => `${d.count ? d.count+'機関' : '多数'}での金融庁・監督指針対応実績があります。検査対応のノウハウを蓄積しています。` },
+        { id:'sec6', q:'インシデント発生時の対応は？',         a: () => `専任のインシデント対応チームが24時間365日待機。検知から即座に対応を開始します。` },
+        { id:'sec7', q:'個人情報保護法・FISC対応は？',        a: () => `個人情報保護法・FISC安全対策基準に準拠した設計・運用を実施しています。` },
+    ];
+
+    const checked = items.filter(item => document.getElementById(item.id).checked);
+    if (checked.length === 0) return;
+
+    const data = {
+        count: document.getElementById('sec_count').value,
+        experts: document.getElementById('sec_experts').value,
+        wipe: document.getElementById('sec_wipe').value,
+    };
+
+    let text = `【S4 セキュリティ：Q&A形式の具体的訴求】\n\n`;
+    checked.forEach(item => {
+        text += `Q: ${item.q}\n`;
+        text += `A: ${item.a(true, data)}\n\n`;
+    });
+
+    if (data.count || data.experts) {
+        text += `■ NTTデータの実績\n`;
+        if (data.count) text += `  国内金融機関導入実績: ${data.count}機関以上\n`;
+        if (data.experts) text += `  セキュリティ専門家: ${fmt(+data.experts)}名以上\n`;
+    }
+
+    text += `\n■ スライド用キャッチコピー案\n`;
+    text += `「守りはNTTデータに任せて、貴金庫は攻め（顧客提案）に集中できます」`;
+
+    const el = document.getElementById('s4_result');
+    el.classList.remove('empty');
+    el.textContent = text;
+    saveBadge(4);
+}
+
+// ── S5: パーソナライズ ─────────────────────────────────────────
+let personas = [];
+
+function addPersona() {
+    const idx = personas.length;
+    personas.push({ name:'', age:'', situation:'', product:'' });
+    renderPersonas();
+}
+
+function renderPersonas() {
+    const container = document.getElementById('personaList');
+    container.innerHTML = '';
+    personas.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'persona-card';
+        card.innerHTML = `
+            <div class="persona-card-title">ペルソナ ${i+1}</div>
+            <div class="input-row">
+                <div class="input-group"><label class="input-label">名前（仮称）</label>
+                    <input type="text" value="${p.name}" oninput="personas[${i}].name=this.value" placeholder="例：Aさん"></div>
+                <div class="input-group"><label class="input-label">年齢・属性</label>
+                    <input type="text" value="${p.age}" oninput="personas[${i}].age=this.value" placeholder="例：35歳・2児の父"></div>
+            </div>
+            <div class="input-group"><label class="input-label">状況・ニーズのヒント</label>
+                <input type="text" value="${p.situation}" oninput="personas[${i}].situation=this.value" placeholder="例：Web で住宅ローンシミュレーションを3回実施"></div>
+            <div class="input-group"><label class="input-label">最適な提案内容</label>
+                <input type="text" value="${p.product}" oninput="personas[${i}].product=this.value" placeholder="例：住宅ローン相談 → 教育積立の複合提案"></div>`;
+        container.appendChild(card);
+    });
+}
+
+function genS5() {
+    const pInput = document.getElementById('p_input').value.trim();
+    const pLogic = document.getElementById('p_logic').value.trim();
+    const pOutput = document.getElementById('p_output').value.trim();
+
+    let text = `【S5 パーソナライズ提案：仕組みとシナリオ】\n\n`;
+
+    if (pInput) text += `■ インプット（活用するデータ）\n${pInput}\n\n`;
+    if (pLogic) text += `■ 処理（マッチングロジック）\n${pLogic}\n\n`;
+    if (pOutput) text += `■ アウトプット（担当者が受け取るもの）\n${pOutput}\n\n`;
+
+    const filled = personas.filter(p => p.name || p.situation);
+    if (filled.length > 0) {
+        text += `■ ペルソナ別 提案シナリオ\n\n`;
+        filled.forEach((p, i) => {
+            text += `【${p.name || 'ペルソナ'+(i+1)}${p.age ? ' / '+p.age : ''}】\n`;
+            if (p.situation) text += `  状況: ${p.situation}\n`;
+            if (p.product) text += `  提案: ${p.product}\n`;
+            text += `\n`;
+        });
+    }
+
+    text += `■ スライド用メッセージ案\n`;
+    text += `「担当者が考えなくても、タブレットが最適な提案を教えてくれる。\n`;
+    text += ` 顧客データが蓄積されるほど、提案の精度は上がり続ける。」`;
+
+    const el = document.getElementById('s5_result');
+    el.classList.remove('empty');
+    el.textContent = text;
+    saveBadge(5);
+}
+
+// ── Export All ─────────────────────────────────────────────────
+function exportAll() {
+    const ids = ['a1_result','ltv_result','roi_result','s2_result','s4_result','s5_result'];
+    const headers = [
+        '## A1 収益試算', '## A3 LTVモデル', '## A6 ROI投資対効果',
+        '## S2 情報ハブ（業務視点）', '## S4 セキュリティ（具体化）', '## S5 パーソナライズ提案'
+    ];
+
+    let md = `# ギャップ補強ワークショップ エクスポート\n`;
+    md += `生成日時: ${new Date().toLocaleString('ja-JP')}\n`;
+    md += `\n---\n\n`;
+
+    let hasAny = false;
+    ids.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el && !el.classList.contains('empty')) {
+            md += `${headers[i]}\n\n`;
+            md += el.textContent + '\n\n---\n\n';
+            hasAny = true;
+        }
+    });
+
+    if (!hasAny) {
+        md += '_（データなし — 各ページで試算・生成を実行してください）_\n';
+    }
+
+    md += `## 次のアクション\n\n`;
+    md += `- [ ] A1/A6の数値を slide05_management_agenda.html に追加\n`;
+    md += `- [ ] A3のLTV試算を新規スライドとして作成\n`;
+    md += `- [ ] S2の業務視点図を slide08_tablet_hub.html に反映\n`;
+    md += `- [ ] S4のQ&Aを slide09_security.html に追加\n`;
+    md += `- [ ] S5のシナリオを新規パーソナライズ提案スライドとして作成\n`;
+
+    const area = document.getElementById('exportArea');
+    area.textContent = md;
+    area.style.display = 'block';
+
+    navigator.clipboard.writeText(md).then(() => {
+        const btn = document.querySelector('.big-export-btn');
+        const orig = btn.textContent;
+        btn.textContent = '✓ クリップボードにコピーしました';
+        setTimeout(() => btn.textContent = orig, 3000);
+    });
+}
+
+// ── Init ────────────────────────────────────────────────────────
+addPersona(); // Start with one persona
+
+</script>
+</body>
+</html>
