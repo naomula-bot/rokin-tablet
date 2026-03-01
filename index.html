@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スライドビューワー｜労働金庫様向け タブレット活用提案</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .topbar {
+            background: #002060;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #00A0E9;
+            flex-shrink: 0;
+        }
+        .topbar h1 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-btn {
+            background: #00A0E9;
+            color: white;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover { background: #0080c0; }
+        .nav-btn:disabled { background: #555; cursor: default; }
+        .slide-counter {
+            font-size: 14px;
+            color: #aaa;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Main Layout */
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: #0d0d1a;
+            overflow-y: auto;
+            flex-shrink: 0;
+            border-right: 1px solid #333;
+        }
+        .sidebar-title {
+            padding: 12px 14px;
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #333;
+        }
+        .slide-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #1a1a2e;
+            transition: background 0.15s;
+        }
+        .slide-item:hover { background: #1a2a4a; }
+        .slide-item.active { background: #002060; border-left: 3px solid #00A0E9; }
+        .slide-item .slide-num {
+            font-size: 10px;
+            color: #00A0E9;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .slide-item .slide-name {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+        .slide-item.active .slide-name { color: #fff; }
+
+        /* Viewer Area */
+        .viewer-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
+            background: #111122;
+        }
+        .slide-title-bar {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .slide-title-bar span {
+            color: #00A0E9;
+            font-weight: 700;
+        }
+        .iframe-wrapper {
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            border: 1px solid #333;
+        }
+        iframe {
+            display: block;
+            border: none;
+            transform-origin: top left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <h1>労働金庫様向け タブレット活用ソリューション提案 ― スライドビューワー</h1>
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">◀ 前へ</button>
+        <span class="slide-counter" id="counter">1 / 19</span>
+        <button class="nav-btn" id="nextBtn" onclick="navigate(1)">次へ ▶</button>
+    </div>
+</div>
+
+<div class="main">
+    <div class="sidebar">
+        <div class="sidebar-title">スライド一覧</div>
+        <div id="slideList"></div>
+    </div>
+    <div class="viewer-area" id="viewerArea">
+        <div class="slide-title-bar">表示中: <span id="currentTitle">-</span></div>
+        <div class="iframe-wrapper" id="iframeWrapper">
+            <iframe id="slideFrame" src="" width="1280" height="720"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+const slides = [
+    { file: "slide01_cover.html",              label: "01 表紙" },
+    { file: "slide02a_three_waves.html",        label: "02a 3つの逆風（旧）" },
+    { file: "slide02b_env_change.html",         label: "02b 環境変化（新）" },
+    { file: "slide03a_shrink.html",             label: "03a 効率化→シュリンク（旧）" },
+    { file: "slide03b_megabank_trap.html",      label: "03b メガバンクの罠（旧）" },
+    { file: "slide04a_differentiation.html",    label: "04a 差別化戦略（旧）" },
+    { file: "slide04b_five_steps.html",         label: "04b 5ステップ概要（旧）" },
+    { file: "slide05_management_agenda.html",   label: "05 経営アジェンダ" },
+    { file: "slide06_tablet_probe.html",        label: "06 タブレット「探査機」" },
+    { file: "slide07_megabank_trap.html",       label: "07 メガバンクの罠" },
+    { file: "slide08_tablet_hub.html",          label: "08 情報ハブ" },
+    { file: "slide09_security.html",            label: "09 セキュリティ基盤" },
+    { file: "slide10_step1_contact.html",       label: "10 Step1 接点獲得" },
+    { file: "slide11_step2_convenience.html",   label: "11 Step2 利便性向上" },
+    { file: "slide12_step3_asset.html",         label: "12 Step3 資産形成支援" },
+    { file: "slide13_step4_deepen.html",        label: "13 Step4 取引深化" },
+    { file: "slide14_step5_relationship.html",  label: "14 Step5 関係性強化" },
+    { file: "slide15_matrix.html",              label: "15 全体像マトリクス" },
+    { file: "slide16_workshop.html",            label: "16 ワークショップ提案" },
+];
+
+let current = 0;
+
+function buildList() {
+    const list = document.getElementById("slideList");
+    slides.forEach((s, i) => {
+        const div = document.createElement("div");
+        div.className = "slide-item" + (i === 0 ? " active" : "");
+        div.innerHTML = `<div class="slide-num">${s.file}</div><div class="slide-name">${s.label}</div>`;
+        div.onclick = () => goTo(i);
+        list.appendChild(div);
+    });
+}
+
+function scaleFrame() {
+    const area = document.getElementById("viewerArea");
+    const wrapper = document.getElementById("iframeWrapper");
+    const frame = document.getElementById("slideFrame");
+    const areaW = area.clientWidth - 40;
+    const areaH = area.clientHeight - 80;
+    const scale = Math.min(areaW / 1280, areaH / 720);
+    frame.style.transform = `scale(${scale})`;
+    wrapper.style.width = (1280 * scale) + "px";
+    wrapper.style.height = (720 * scale) + "px";
+    frame.style.transformOrigin = "top left";
+}
+
+function goTo(i) {
+    current = i;
+    const s = slides[i];
+    document.getElementById("slideFrame").src = s.file;
+    document.getElementById("currentTitle").textContent = s.label;
+    document.getElementById("counter").textContent = `${i + 1} / ${slides.length}`;
+    document.getElementById("prevBtn").disabled = i === 0;
+    document.getElementById("nextBtn").disabled = i === slides.length - 1;
+    document.querySelectorAll(".slide-item").forEach((el, idx) => {
+        el.classList.toggle("active", idx === i);
+    });
+    // Scroll sidebar item into view
+    document.querySelectorAll(".slide-item")[i].scrollIntoView({ block: "nearest" });
+}
+
+function navigate(dir) {
+    const next = current + dir;
+    if (next >= 0 && next < slides.length) goTo(next);
+}
+
+// Keyboard navigation
+document.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") navigate(1);
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") navigate(-1);
+});
+
+window.addEventListener("resize", scaleFrame);
+document.getElementById("slideFrame").addEventListener("load", scaleFrame);
+
+buildList();
+goTo(0);
+scaleFrame();
+</script>
+</body>
+</html>
