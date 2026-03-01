@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, height=720, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; }
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #002060;
+            background-image: linear-gradient(rgba(0, 32, 96, 0.7), rgba(0, 32, 96, 0.8)), url('https://private-us-east-1.manuscdn.com/sessionFile/lkfEP0yQvHVSPBaJf6MMzP/sandbox/slides_resource_i8iad7yp6gid8eelfbgre-312d150d-e2b-prod-sg1_1771759228151_na1fn_L2hvbWUvdWJ1bnR1L2NvdmVyX2J1aWxkaW5n.jpg?x-oss-process=image/resize,w_1560,h_1560/format,webp&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvbGtmRVAweVF2SFZTUEJhSmY2TU16UC9zYW5kYm94L3NsaWRlc19yZXNvdXJjZV9pOGlhZDd5cDZnaWQ4ZWVsZmJncmUtMzEyZDE1MGQtZTJiLXByb2Qtc2cxXzE3NzE3NTkyMjgxNTFfbmExZm5fTDJodmJXVXZkV0oxYm5SMUwyTnZkbVZ5WDJKMWFXeGthVzVuLmpwZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE1NjAsaF8xNTYwL2Zvcm1hdCx3ZWJwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=n6yW4oKwHa~c9jrYOgIaEfXTwKNJq3yf9499VVSGn-Xljucvj2wl8JrJYViR-0sh8pjLx-x8LlaReO7-~kCoEPX5q1UdrGCVBc3JrWp6STxLLfwl~6nqajF1dLDmyZINQKyYFJ664sws0WjPvbo4WD70S2sXbMnnowDmUHp7BRIk9dbKGzlUc09DpiscDv36XkY1ItD3cgTjrXFL8-y2PQNCOqr9ScepaQmap1KsbW4BRZSzFBFpG7fIFxdfqvvW1m4qLeJyvcSk71FAhkcDYJcpA-sJkZORkRUoGIPKA8dRSqS5UtSvUAhtKrAEcQpeDWt8lKMUDgsgVOuis7fIEQ__');
+            background-size: cover;
+            background-position: center;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Logo Area */
+        .logo-area {
+            position: absolute;
+            top: 40px;
+            left: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            font-size: 32px;
+            color: #FFFFFF;
+        }
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-family: 'Roboto', sans-serif;
+        }
+        /* Main Content */
+        .content-wrapper {
+            text-align: center;
+            max-width: 1000px;
+            z-index: 1;
+        }
+
+        .main-title {
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle-container {
+            display: inline-block;
+            position: relative;
+            padding-bottom: 8px; /* shrunk inner padding */
+            margin-bottom: 24px; /* reduced spacing */
+        }
+
+        .subtitle {
+            font-size: 32px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .subtitle-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: #00A0E9;
+        }
+        /* Footer Info */
+        .footer-info {
+            position: absolute;
+            bottom: 40px;
+            left: 50px;
+            text-align: left;
+        }
+
+        .date {
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .presenter {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        /* Decorative Element */
+        .decorative-line {
+            position: absolute;
+            top: 0;
+            right: 100px;
+            width: 1px;
+            height: 220px; /* reduced height to avoid overlap */
+            background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+        }
+
+        /* Removed large decorative circle to eliminate overflow/overlap */
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Logo -->
+        <div class="logo-area">
+            <i class="fas fa-globe logo-icon"></i>
+            <span class="logo-text">NTT DATA</span>
+        </div>
+        <!-- Decorative Elements -->
+        <div class="decorative-line"></div>
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <h1 class="main-title">労働金庫様向け<br>タブレット活用ソリューション提案</h1>
+            <div class="subtitle-container">
+                <h2 class="subtitle">対面チャネルの価値最大化によるトップライン向上戦略</h2>
+            </div>
+        </div>
+        <!-- Footer -->
+        <div class="footer-info">
+            <p class="date">2026年2月</p>
+            <p class="presenter">株式会社NTTデータ</p>
+        </div>
+    </div>
+</body>
+</html>
