@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今夜の一本 — 映画・ドラマ発見アプリ</title>
+  <style>
+    :root {
+      --bg: #0d0d12;
+      --surface: #16161f;
+      --surface2: #1e1e2a;
+      --border: #2a2a3a;
+      --gold: #e8c96d;
+      --gold-dim: #a88e3e;
+      --text: #e8e8f0;
+      --text-dim: #888899;
+      --red: #e05252;
+      --green: #52c07a;
+      --blue: #5284e0;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(180deg, #0d0d12 0%, transparent 100%);
+      padding: 32px 24px 16px;
+      text-align: center;
+      position: relative;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,201,109,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .app-logo {
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+    h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    h1 span { color: var(--gold); }
+    .subtitle {
+      margin-top: 8px;
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 0 20px 60px; }
+
+    section { margin-top: 40px; }
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    /* ── MOOD ── */
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 480px) { .mood-grid { grid-template-columns: repeat(2, 1fr); } }
+    .mood-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .mood-btn:hover { border-color: var(--gold-dim); background: var(--surface2); }
+    .mood-btn.active {
+      border-color: var(--gold);
+      background: rgba(232,201,109,0.1);
+    }
+    .mood-btn .emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+
+    /* ── FILTERS ── */
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 140px; }
+    .filter-group label { font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; }
+    .filter-group select, .filter-group input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 14px;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: var(--gold-dim);
+    }
+
+    /* ── API KEY ── */
+    .api-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .api-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .api-panel-header:hover { color: var(--text); }
+    .api-panel-header .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+    .api-panel-header .status-dot.connected { background: var(--green); }
+    .api-panel-body {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border);
+    }
+    .api-panel-body.open { display: block; }
+    .api-panel-body p { font-size: 12px; color: var(--text-dim); margin: 12px 0 8px; }
+    .api-panel-body a { color: var(--gold); text-decoration: none; }
+    .api-input-row { display: flex; gap: 8px; }
+    .api-input-row input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: monospace;
+    }
+    .api-input-row input:focus { outline: none; border-color: var(--gold-dim); }
+    .btn-save {
+      background: var(--gold);
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-save:hover { background: #f0d878; }
+
+    /* ── CTA BUTTON ── */
+    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-ai {
+      flex: 1;
+      min-width: 200px;
+      background: linear-gradient(135deg, #e8c96d, #c8993d);
+      color: #111;
+      border: none;
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-ai:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(232,201,109,0.3); }
+    .btn-ai:active { transform: translateY(0); }
+    .btn-ai:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { border-color: var(--gold-dim); }
+
+    /* ── LOADING ── */
+    .loading-box {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      text-align: center;
+    }
+    .loading-box.visible { display: block; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-box p { color: var(--text-dim); font-size: 14px; }
+
+    /* ── ERROR ── */
+    .error-box {
+      display: none;
+      background: rgba(224,82,82,0.1);
+      border: 1px solid rgba(224,82,82,0.4);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      color: var(--red);
+      font-size: 14px;
+    }
+    .error-box.visible { display: block; }
+
+    /* ── RESULTS ── */
+    #results-section { display: none; }
+    #results-section.visible { display: block; }
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .results-header h2 { font-size: 18px; }
+    .results-header span { font-size: 12px; color: var(--text-dim); }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .movie-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .movie-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .movie-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+    .movie-card:hover::before { opacity: 1; }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+    .tag.genre { border-color: rgba(82,132,224,0.4); color: #7fa8ef; }
+    .tag.country { border-color: var(--border); }
+    .tag.year { color: var(--text-dim); }
+    .tag.platform { border-color: rgba(82,192,122,0.4); color: #7dd4a0; }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .card-rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .stars { color: var(--gold); font-size: 13px; }
+    .rating-val { font-size: 13px; color: var(--text-dim); }
+
+    .card-synopsis {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .card-why {
+      background: rgba(232,201,109,0.08);
+      border-left: 3px solid var(--gold-dim);
+      border-radius: 0 6px 6px 0;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--gold);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-action {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      padding: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .btn-action:hover { border-color: var(--gold-dim); color: var(--text); }
+    .btn-action.active { border-color: var(--gold); color: var(--gold); background: rgba(232,201,109,0.08); }
+    .btn-action.watched { border-color: var(--green); color: var(--green); background: rgba(82,192,122,0.08); }
+
+    /* ── WATCHLIST ── */
+    #watchlist-section { display: none; }
+    #watchlist-section.visible { display: block; }
+    .watchlist-items { display: flex; flex-direction: column; gap: 10px; }
+    .watchlist-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .watchlist-item .item-title { flex: 1; font-size: 15px; font-weight: 600; }
+    .watchlist-item .item-meta { font-size: 12px; color: var(--text-dim); }
+    .btn-remove {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+    }
+    .btn-remove:hover { color: var(--red); }
+    .watchlist-item .rating-stars { color: var(--gold); font-size: 14px; cursor: pointer; }
+
+    /* ── HISTORY ── */
+    .history-chip {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin: 4px;
+    }
+    .history-chip .rating { color: var(--gold); margin-left: 4px; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-dim);
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+    footer a { color: var(--gold-dim); text-decoration: none; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: var(--text);
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="app-logo">🎬 Movie Discovery</div>
+  <h1>今夜の<span>一本</span>、見つけよう</h1>
+  <p class="subtitle">気分を選ぶだけで、Claude AIが今夜ぴったりの作品を提案します</p>
+</header>
+
+<div class="container">
+
+  <!-- MOOD -->
+  <section>
+    <div class="section-label">Step 1 — 今の気分は？</div>
+    <div class="mood-grid">
+      <button class="mood-btn" data-mood="癒やされたい">
+        <span class="emoji">😌</span>癒やされたい
+      </button>
+      <button class="mood-btn" data-mood="笑いたい">
+        <span class="emoji">😂</span>笑いたい
+      </button>
+      <button class="mood-btn" data-mood="感動したい">
+        <span class="emoji">😢</span>感動したい
+      </button>
+      <button class="mood-btn" data-mood="ドキドキしたい">
+        <span class="emoji">😰</span>ドキドキしたい
+      </button>
+      <button class="mood-btn" data-mood="ゾクゾクしたい">
+        <span class="emoji">😱</span>ゾクゾクしたい
+      </button>
+      <button class="mood-btn" data-mood="考えさせられたい">
+        <span class="emoji">🤔</span>考えさせられたい
+      </button>
+      <button class="mood-btn" data-mood="恋愛気分">
+        <span class="emoji">💕</span>恋愛気分
+      </button>
+      <button class="mood-btn" data-mood="熱くなりたい">
+        <span class="emoji">🔥</span>熱くなりたい
+      </button>
+    </div>
+  </section>
+
+  <!-- FILTERS -->
+  <section>
+    <div class="section-label">Step 2 — こだわり条件（任意）</div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>ジャンル</label>
+        <select id="filter-genre">
+          <option value="">こだわらない</option>
+          <option>ヒューマンドラマ</option>
+          <option>コメディ</option>
+          <option>サスペンス・スリラー</option>
+          <option>ラブストーリー</option>
+          <option>SF・ファンタジー</option>
+          <option>ホラー</option>
+          <option>アクション</option>
+          <option>アニメ</option>
+          <option>ドキュメンタリー</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>国・地域</label>
+        <select id="filter-country">
+          <option value="">こだわらない</option>
+          <option>日本</option>
+          <option>韓国</option>
+          <option>アメリカ・イギリス</option>
+          <option>ヨーロッパ</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>種類</label>
+        <select id="filter-type">
+          <option value="">こだわらない</option>
+          <option>映画</option>
+          <option>連続ドラマ</option>
+          <option>ミニシリーズ</option>
+          <option>アニメシリーズ</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- API KEY -->
+  <section>
+    <div class="section-label">Step 3 — Claude AI 接続設定</div>
+    <div class="api-panel">
+      <div class="api-panel-header" onclick="toggleApiPanel()">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="api-status-text">APIキー未設定</span>
+        </div>
+        <span id="api-panel-chevron">▼ 設定する</span>
+      </div>
+      <div class="api-panel-body" id="api-panel-body">
+        <p>
+          Anthropic の APIキーを入力してください。キーはブラウザのローカルストレージにのみ保存され、外部に送信されることはありません。<br>
+          APIキーは <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> から取得できます。
+        </p>
+        <div class="api-input-row">
+          <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off">
+          <button class="btn-save" onclick="saveApiKey()">保存</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section>
+    <div class="section-label">Step 4 — AIに聞く</div>
+    <div class="cta-row">
+      <button class="btn-ai" id="btn-recommend" onclick="getRecommendations()">
+        <span>✨</span> 今夜の作品を推薦してもらう
+      </button>
+      <button class="btn-secondary" onclick="clearResults()">リセット</button>
+    </div>
+  </section>
+
+  <!-- LOADING -->
+  <section>
+    <div class="loading-box" id="loading-box">
+      <div class="spinner"></div>
+      <p id="loading-text">Claudeが今夜の作品を考えています…</p>
+    </div>
+  </section>
+
+  <!-- ERROR -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- RESULTS -->
+  <section id="results-section">
+    <div class="results-header">
+      <h2>今夜のおすすめ</h2>
+      <span id="results-meta"></span>
+    </div>
+    <div class="card-grid" id="card-grid"></div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- WATCHLIST -->
+  <section id="watchlist-section">
+    <div class="section-label">ウォッチリスト</div>
+    <div class="watchlist-items" id="watchlist-items"></div>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="history-section">
+    <div class="section-label">視聴履歴</div>
+    <div id="history-chips"></div>
+  </section>
+
+</div>
+
+<footer>
+  今夜の一本 — Powered by <a href="https://www.anthropic.com" target="_blank">Claude AI</a>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+const state = {
+  mood: null,
+  watchlist: JSON.parse(localStorage.getItem('watchlist') || '[]'),
+  history: JSON.parse(localStorage.getItem('history') || '[]'),
+};
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  updateApiStatus();
+  renderWatchlist();
+  renderHistory();
+
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.mood = btn.dataset.mood;
+    });
+  });
+});
+
+// ── API KEY ────────────────────────────────────────────────────────────────
+function toggleApiPanel() {
+  const body = document.getElementById('api-panel-body');
+  const chevron = document.getElementById('api-panel-chevron');
+  const open = body.classList.toggle('open');
+  chevron.textContent = open ? '▲ 閉じる' : '▼ 設定する';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    showToast('⚠️ 有効なAPIキーを入力してください（sk-ant- で始まります）');
+    return;
+  }
+  localStorage.setItem('anthropic_api_key', key);
+  updateApiStatus();
+  toggleApiPanel();
+  showToast('✅ APIキーを保存しました');
+}
+
+function updateApiStatus() {
+  const key = localStorage.getItem('anthropic_api_key');
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('api-status-text');
+  if (key) {
+    dot.classList.add('connected');
+    text.textContent = 'APIキー設定済み (' + key.slice(0, 12) + '…)';
+    document.getElementById('api-panel-chevron').textContent = '▼ 変更する';
+  } else {
+    dot.classList.remove('connected');
+    text.textContent = 'APIキー未設定';
+    document.getElementById('api-panel-chevron').textContent = '▼ 設定する';
+  }
+}
+
+// ── RECOMMEND ─────────────────────────────────────────────────────────────
+async function getRecommendations() {
+  const apiKey = localStorage.getItem('anthropic_api_key');
+  if (!apiKey) {
+    showError('APIキーが設定されていません。Step 3 でAPIキーを入力してください。');
+    return;
+  }
+
+  const genre  = document.getElementById('filter-genre').value;
+  const country = document.getElementById('filter-country').value;
+  const type   = document.getElementById('filter-type').value;
+  const watched = state.history.map(h => h.title);
+
+  const moodText   = state.mood || 'こだわらない';
+  const genreText  = genre   || 'こだわらない';
+  const countryText = country || 'こだわらない';
+  const typeText   = type    || 'こだわらない';
+
+  const prompt = `あなたは映画・ドラマの専門レコメンダーです。以下のユーザー情報をもとに、今夜見るのにぴったりな作品を5本推薦してください。
+
+【ユーザー情報】
+- 今の気分: ${moodText}
+- 好みのジャンル: ${genreText}
+- 希望の国・地域: ${countryText}
+- 種類: ${typeText}
+- 視聴済み作品（重複不可）: ${watched.length > 0 ? watched.join('、') : 'なし'}
+
+【出力形式】
+必ずJSON配列のみを出力し、説明文は不要です。形式は以下の通り：
+
+[
+  {
+    "title": "作品タイトル（日本語）",
+    "titleEn": "英語タイトルまたは原題",
+    "year": 2023,
+    "genre": "ジャンル（例: ヒューマンドラマ）",
+    "country": "国・地域（例: 韓国）",
+    "type": "種類（映画 or 連続ドラマ or ミニシリーズ or アニメ）",
+    "rating": 8.5,
+    "synopsis": "あらすじ（80〜120字程度）",
+    "whyTonight": "今のあなたに特に勧める理由（40〜60字）",
+    "platform": "視聴可能なサービス（Netflix、Amazon Prime、Disney+、Hulu、U-NEXT 等）"
+  }
+]
+
+ジャンル・国・気分の条件を満たし、視聴済み作品と重複しない、実在する作品を推薦してください。`;
+
+  // UI: loading
+  document.getElementById('btn-recommend').disabled = true;
+  document.getElementById('loading-box').classList.add('visible');
+  document.getElementById('error-box').classList.remove('visible');
+  document.getElementById('results-section').classList.remove('visible');
+
+  const loadingMsgs = [
+    'Claudeが今夜の作品を考えています…',
+    'あなたの気分にぴったりの作品を探しています…',
+    '視聴履歴をもとに最適な5本を選んでいます…',
+  ];
+  let loadingIdx = 0;
+  const loadingInterval = setInterval(() => {
+    loadingIdx = (loadingIdx + 1) % loadingMsgs.length;
+    document.getElementById('loading-text').textContent = loadingMsgs[loadingIdx];
+  }, 2000);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    clearInterval(loadingInterval);
+    document.getElementById('loading-box').classList.remove('visible');
+    document.getElementById('btn-recommend').disabled = false;
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || `APIエラー: ${res.status}`);
+    }
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '';
+
+    // Extract JSON array from response
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error('AIの返答をパースできませんでした。もう一度お試しください。');
+
+    const movies = JSON.parse(jsonMatch[0]);
+    renderResults(movies, moodText);
+  } catch (err) {
+    clearInterval(loadingInterval);
+    document.getElementById('loading-box').classList.remove('visible');
+    document.getElementById('btn-recommend').disabled = false;
+    showError(err.message);
+  }
+}
+
+// ── RENDER RESULTS ─────────────────────────────────────────────────────────
+function renderResults(movies, mood) {
+  const section = document.getElementById('results-section');
+  const grid = document.getElementById('card-grid');
+  const meta = document.getElementById('results-meta');
+
+  meta.textContent = `気分: ${mood} ／ ${movies.length}本`;
+  grid.innerHTML = '';
+
+  movies.forEach((m, i) => {
+    const inWatchlist = state.watchlist.some(w => w.title === m.title);
+    const inHistory = state.history.some(h => h.title === m.title);
+    const stars = ratingToStars(m.rating);
+
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    card.style.animationDelay = `${i * 0.06}s`;
+    card.innerHTML = `
+      <div class="card-meta">
+        <span class="tag genre">${m.genre || ''}</span>
+        <span class="tag country">${m.country || ''}</span>
+        <span class="tag year">${m.year || ''}</span>
+        ${m.platform ? `<span class="tag platform">${m.platform}</span>` : ''}
+      </div>
+      <div class="card-title">${esc(m.title)}</div>
+      ${m.titleEn ? `<div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;">${esc(m.titleEn)}</div>` : ''}
+      <div class="card-rating">
+        <span class="stars">${stars}</span>
+        <span class="rating-val">${m.rating ? m.rating.toFixed(1) : ''}</span>
+        <span class="tag" style="margin-left:4px;">${m.type || ''}</span>
+      </div>
+      <div class="card-synopsis">${esc(m.synopsis || '')}</div>
+      ${m.whyTonight ? `<div class="card-why">💡 ${esc(m.whyTonight)}</div>` : ''}
+      <div class="card-actions">
+        <button class="btn-action ${inWatchlist ? 'active' : ''}" id="wl-${i}"
+          onclick="toggleWatchlist(${i}, ${JSON.stringify(m).replace(/"/g, '&quot;')})">
+          ${inWatchlist ? '✅ リストに追加済み' : '＋ ウォッチリスト'}
+        </button>
+        <button class="btn-action ${inHistory ? 'watched' : ''}" id="hist-${i}"
+          onclick="markWatched(${i}, ${JSON.stringify(m).replace(/"/g, '&quot;')})">
+          ${inHistory ? '👁 視聴済み' : '👁 見た！'}
+        </button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  section.classList.add('visible');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── WATCHLIST ──────────────────────────────────────────────────────────────
+function toggleWatchlist(idx, movie) {
+  const exists = state.watchlist.findIndex(w => w.title === movie.title);
+  if (exists >= 0) {
+    state.watchlist.splice(exists, 1);
+    showToast(`「${movie.title}」をリストから削除しました`);
+  } else {
+    state.watchlist.push({ title: movie.title, genre: movie.genre, country: movie.country, year: movie.year, platform: movie.platform, rating: 0 });
+    showToast(`「${movie.title}」をウォッチリストに追加しました ✅`);
+  }
+  saveWatchlist();
+  renderWatchlist();
+  // Update card button
+  const btn = document.getElementById(`wl-${idx}`);
+  if (btn) {
+    const inList = state.watchlist.some(w => w.title === movie.title);
+    btn.textContent = inList ? '✅ リストに追加済み' : '＋ ウォッチリスト';
+    btn.classList.toggle('active', inList);
+  }
+}
+
+function markWatched(idx, movie) {
+  const exists = state.history.findIndex(h => h.title === movie.title);
+  if (exists < 0) {
+    const userRating = promptRating(movie.title);
+    state.history.unshift({ title: movie.title, genre: movie.genre, rating: userRating, watchedAt: new Date().toLocaleDateString('ja-JP') });
+    // Remove from watchlist if present
+    const wlIdx = state.watchlist.findIndex(w => w.title === movie.title);
+    if (wlIdx >= 0) state.watchlist.splice(wlIdx, 1);
+    saveWatchlist();
+    saveHistory();
+    renderWatchlist();
+    renderHistory();
+    showToast(`「${movie.title}」を視聴済みにしました 👁`);
+  }
+  const btn = document.getElementById(`hist-${idx}`);
+  if (btn) { btn.textContent = '👁 視聴済み'; btn.classList.add('watched'); }
+}
+
+function promptRating(title) {
+  const raw = prompt(`「${title}」は何点でしたか？（1〜5）`, '4');
+  const n = parseFloat(raw);
+  return isNaN(n) ? 0 : Math.min(5, Math.max(0, n));
+}
+
+function saveWatchlist() { localStorage.setItem('watchlist', JSON.stringify(state.watchlist)); }
+function saveHistory()   { localStorage.setItem('history',   JSON.stringify(state.history)); }
+
+function renderWatchlist() {
+  const section = document.getElementById('watchlist-section');
+  const container = document.getElementById('watchlist-items');
+  if (state.watchlist.length === 0) {
+    section.classList.remove('visible');
+    return;
+  }
+  section.classList.add('visible');
+  container.innerHTML = state.watchlist.map((item, i) => `
+    <div class="watchlist-item">
+      <div>
+        <div class="item-title">${esc(item.title)}</div>
+        <div class="item-meta">${[item.genre, item.country, item.year, item.platform].filter(Boolean).join(' · ')}</div>
+      </div>
+      <button class="btn-remove" onclick="removeFromWatchlist(${i})" title="削除">×</button>
+    </div>
+  `).join('');
+}
+
+function removeFromWatchlist(i) {
+  const title = state.watchlist[i].title;
+  state.watchlist.splice(i, 1);
+  saveWatchlist();
+  renderWatchlist();
+  showToast(`「${title}」を削除しました`);
+}
+
+function renderHistory() {
+  const section = document.getElementById('history-section');
+  const container = document.getElementById('history-chips');
+  if (state.history.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  container.innerHTML = state.history.map(h => `
+    <span class="history-chip">
+      ${esc(h.title)}
+      ${h.rating ? `<span class="rating">${'★'.repeat(Math.round(h.rating))}</span>` : ''}
+    </span>
+  `).join('');
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function clearResults() {
+  document.getElementById('results-section').classList.remove('visible');
+  document.getElementById('error-box').classList.remove('visible');
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  state.mood = null;
+  document.getElementById('filter-genre').value = '';
+  document.getElementById('filter-country').value = '';
+  document.getElementById('filter-type').value = '';
+}
+
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.textContent = '⚠️ ' + msg;
+  box.classList.add('visible');
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function ratingToStars(rating) {
+  if (!rating) return '';
+  const full = Math.round(rating / 2);
+  return '★'.repeat(full) + '☆'.repeat(5 - full);
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
